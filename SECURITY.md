@@ -8,8 +8,8 @@ currently being supported with security updates.
 | Version | Supported          |
 | ------- | ------------------ |
 | Mobil   | :white_check_mark: |
-| PC      | :x:                |
-| 4.0.x   | :white_check_mark: |
+| PC      | :white_check_mark: |
+| edg     | :x:                |
 | < 4.0   | :x:                |
 
 ## Reporting a Vulnerability
