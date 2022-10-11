@@ -5,7 +5,9 @@ try {
   $name_Web_title = "Smart Blessing Consulting";
   $key_encryp = "Cu4lQu3rt@kenD3S3guriD4D";
   $api_uri = "https://sbc-wallet-api.herokuapp.com/";
+
   $produccion = true;
+  
   $url = $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"];
   date_default_timezone_set("America/Santo_Domingo");
   /* Una declaración condicional que comprueba si la variable ón es verdadera o falsa. Si es
