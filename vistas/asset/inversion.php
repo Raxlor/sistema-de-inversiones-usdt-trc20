@@ -35,7 +35,6 @@ if (mysqli_query($conexion, $sentence)) {
                 <div class="add-balance-area pd-top-40">
                     <div class="ba-add-balance-inner bg-white" id="">
                         <h6 class="title"></h6>
-                   <!-- * Un control giratorio que está oculto hasta que se envía el formulario. */ -->
                         <div class="lds-ring spinner" id="spinner-load-generar-table-two" hidden>
                             <div></div>
                             <div></div>
@@ -52,22 +51,24 @@ if (mysqli_query($conexion, $sentence)) {
                                     </h6>
                                 </div>
                                 <div class="col-md-6 col-xs-6  my-2">
-                                    <input class="form-control" type="number" name="" id="mont_id" min="10" step="10" placeholder="Monto a Invertir" required>
+                                    <input class="form-control" type="number" name="" id="mont_id"  placeholder="Monto a Invertir" required>
                                 </div>
 
                                 <div class="col-md-6 col-xs-6 my-2">
-                                    <select class="form-control" name="" id="produc_id" required>
+
+                                    <select class="form-control" name="" id="produc_id" required onchange="info_membresia($(this).find('option:selected').attr('id'))">
                                         <option value="">Selecionar Producto</option>
                                         <?php
-                                        $sql_productos = "SELECT * FROM `productos` WHERE 1";
+                                        $sql_productos = "SELECT * FROM `productos` WHERE `estado`=1";
                                         $query = mysqli_query($conexion, $sql_productos);
                                         while ($productos = mysqli_fetch_array($query)) {
                                         ?>
-                                            <option value="<?php echo $productos[1] ?>"><?php echo $productos[1] ?></option>
+                                            <option id="<?php echo $productos[0] ?>" value="<?php echo $productos[1] ?>"><?php echo $productos[1] ?> (<?php echo $productos[2] ?>%)</option>
                                         <?php
                                         }
                                         ?>
                                     </select>
+                                    
                                 </div>
                                 <div class="col-md-12 my-2">
                                     <button class="btn btn-smart-login text-white" type="submit">aceptar</button>
