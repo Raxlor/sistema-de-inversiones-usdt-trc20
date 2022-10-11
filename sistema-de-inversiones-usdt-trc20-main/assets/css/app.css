@@ -1,0 +1,431 @@
+.spinner {
+  display: block;
+}
+
+.custom-height {
+  min-height: 100vh;
+}
+
+#fuse-splash-screen {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #121212;
+  z-index: 99999999999999999999999999999999;
+  pointer-events: none;
+}
+
+#fuse-splash-screen .center {
+  display: block;
+  width: 100%;
+  position: absolute;
+  top: 40%;
+  left: 0%;
+  transform: translateY(0%);
+}
+
+#fuse-splash-screen .logo {
+  width: 128px;
+  margin: 0 auto;
+}
+
+#fuse-splash-screen .logo img {
+  filter: drop-shadow(0px 10px 6px rgba(0, 0, 0, 0.2));
+}
+
+#fuse-splash-screen .spinner-wrapper {
+  display: block;
+  position: relative;
+  width: 100%;
+  min-height: 100px;
+  height: 100px;
+}
+
+#fuse-splash-screen .spinner-wrapper .spinner {
+  position: absolute;
+  overflow: hidden;
+  left: 50%;
+  margin-left: -50px;
+  animation: outer-rotate 2.91667s linear infinite;
+}
+
+#fuse-splash-screen .spinner-wrapper .spinner .inner {
+  width: 100px;
+  height: 100px;
+  position: relative;
+  animation: sporadic-rotate 5.25s cubic-bezier(0.35, 0, 0.25, 1) infinite;
+}
+
+#fuse-splash-screen .spinner-wrapper .spinner .inner .gap {
+  position: absolute;
+  left: 49px;
+  right: 49px;
+  top: 0;
+  bottom: 0;
+  border-top: 10px solid;
+  box-sizing: border-box;
+}
+
+#fuse-splash-screen .spinner-wrapper .spinner .inner .left,
+#fuse-splash-screen .spinner-wrapper .spinner .inner .right {
+  position: absolute;
+  top: 0;
+  height: 100px;
+  width: 50px;
+  overflow: hidden;
+}
+
+#fuse-splash-screen .spinner-wrapper .spinner .inner .left .half-circle,
+#fuse-splash-screen .spinner-wrapper .spinner .inner .right .half-circle {
+  position: absolute;
+  top: 0;
+  width: 1000px;
+  height: 1000px;
+  box-sizing: border-box;
+  border: 10px solid #61dafb;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+}
+
+#fuse-splash-screen .spinner-wrapper .spinner .inner .left {
+  left: 0;
+}
+
+#fuse-splash-screen .spinner-wrapper .spinner .inner .left .half-circle {
+  left: 0;
+  border-right-color: transparent;
+  animation: left-wobble 1.3125s cubic-bezier(0.35, 0, 0.25, 1) infinite;
+  -webkit-animation: left-wobble 1.3125s cubic-bezier(0.35, 0, 0.25, 1) infinite;
+}
+
+#fuse-splash-screen .spinner-wrapper .spinner .inner .right {
+  right: 0;
+}
+
+#fuse-splash-screen .spinner-wrapper .spinner .inner .right .half-circle {
+  right: 0;
+  border-left-color: transparent;
+  animation: right-wobble 1.3125s cubic-bezier(0.35, 0, 0.25, 1) infinite;
+  -webkit-animation: right-wobble 1.3125s cubic-bezier(0.35, 0, 0.25, 1)
+    infinite;
+}
+
+@keyframes outer-rotate {
+  0% {
+    transform: rotate(0deg) scale(0.5);
+  }
+
+  100% {
+    transform: rotate(360deg) scale(0.5);
+  }
+}
+
+@keyframes left-wobble {
+  0%,
+  100% {
+    transform: rotate(130deg);
+  }
+
+  50% {
+    transform: rotate(-5deg);
+  }
+}
+
+@keyframes right-wobble {
+  0%,
+  100% {
+    transform: rotate(-130deg);
+  }
+
+  50% {
+    transform: rotate(5deg);
+  }
+}
+
+@keyframes sporadic-rotate {
+  12.5% {
+    transform: rotate(135deg);
+  }
+
+  25% {
+    transform: rotate(270deg);
+  }
+
+  37.5% {
+    transform: rotate(405deg);
+  }
+
+  50% {
+    transform: rotate(540deg);
+  }
+
+  62.5% {
+    transform: rotate(675deg);
+  }
+
+  75% {
+    transform: rotate(810deg);
+  }
+
+  87.5% {
+    transform: rotate(945deg);
+  }
+
+  100% {
+    transform: rotate(1080deg);
+  }
+}
+
+.container-login {
+  padding: 10%;
+}
+
+@media (min-width: 1000px) {
+  .container-login {
+    max-width: 50% !important;
+  }
+}
+@media (min-width: 1000px) {
+  .logo-menu {
+    max-width: 15%;
+  }
+}
+@media (max-width: 1000px) {
+  .logo-menu {
+    max-width: 30%;
+  }
+}
+@media (max-width: 1000px) {
+  .page_vista {
+    display: grid;
+    z-index: 1;
+    position: absolute;
+    top: 8%;
+    left: 0%;
+    align-content: space-between;
+    align-items: center;
+    justify-items: stretch;
+    justify-content: space-evenly;
+  }
+}
+@media (min-width: 1000px) {
+  .page_vista {
+    display: grid;
+    z-index: 1;
+    position: absolute;
+    top: 8%;
+    left: 12%;
+    align-content: space-between;
+    align-items: center;
+    justify-items: stretch;
+    justify-content: space-evenly;
+  }
+}
+.info-contratos {
+  height: 80px;
+  box-shadow: 5px 5px 20px 0px #58c7d870;
+}
+/* @property --p {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+} */
+
+.pie {
+  --p: 0;
+  --b: 5px;
+  --c: darkred;
+  --w: 42px;
+
+  width: var(--w);
+  aspect-ratio: 1;
+  position: relative;
+  display: inline-grid;
+  margin: -4px;
+  place-content: center;
+  font-size: 11px;
+  font-weight: bold;
+  font-family: sans-serif;
+}
+.pie:before,
+.pie:after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+}
+.pie:before {
+  inset: 0;
+  background: radial-gradient(farthest-side, var(--c) 98%, #0000) top/var(--b)
+      var(--b) no-repeat,
+    conic-gradient(var(--c) calc(var(--p) * 1%), #0000 0);
+  -webkit-mask: radial-gradient(
+    farthest-side,
+    #0000 calc(99% - var(--b)),
+    #000 calc(100% - var(--b))
+  );
+  mask: radial-gradient(
+    farthest-side,
+    #0000 calc(99% - var(--b)),
+    #000 calc(100% - var(--b))
+  );
+}
+.pie:after {
+  inset: calc(50% - var(--b) / 2);
+  background: var(--c);
+  transform: rotate(calc(var(--p) * 3.6deg))
+    translateY(calc(50% - var(--w) / 2));
+}
+.animate {
+  animation: p 1s 0.5s both;
+}
+.no-round:before {
+  background-size: 0 0, auto;
+}
+.no-round:after {
+  content: none;
+}
+@keyframes p {
+  from {
+    --p: 0;
+  }
+}
+
+body {
+  background: #ddd;
+}
+.lds-ring {
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+
+.lds-ring div {
+  box-sizing: border-box;
+  display: block;
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  margin: 8px;
+  border: 8px solid #cef;
+  border-radius: 50%;
+  animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  border-color: #cef transparent transparent transparent;
+}
+
+.lds-ring div:nth-child(1) {
+  animation-delay: -0.45s;
+}
+
+.lds-ring div:nth-child(2) {
+  animation-delay: -0.3s;
+}
+
+.lds-ring div:nth-child(3) {
+  animation-delay: -0.15s;
+}
+
+@keyframes lds-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.slider-card-usdt {
+  background-image: url(https://img.freepik.com/vector-premium/simbolo-token-atadura-icono-moneda-usdt-circulo-digital-tema-criptomoneda-sobre-fondo-azul-oro-digital-estilo-futurista-sitio-web-o-banner-copie-espacio-eps10-vectorial_337410-1040.jpg?w=2000) !important;
+  background-position-y: 50% !important;
+  background-position-x: center !important;
+}
+.navbar {
+  position: relative;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  padding: 0rem 0rem !important;
+}
+
+@media (min-width: 1000px) {
+  .dropdown-menu {
+    left: 85%;
+    position: absolute !important;
+    top: 98% !important;
+    /* right: 1.5%; */
+    z-index: 1000 !important;
+    /* float: right!important; */
+    /* min-width: 0rem!important; */
+    /* padding: 0.5rem 0!important; */
+    /* margin: 0.125rem 0 0!important; */
+    /*font-size: 1rem!important;*/
+    color: #ffffff !important;
+    text-align: left !important;
+    list-style: none;
+    background-color: #fff !important;
+    border-radius: 0px 0px 1px 10px !important;
+  }
+  .perfil_img {
+    width: 40px;
+    border-radius: 100px;
+    position: absolute;
+    right: 1.2%;
+    top: 1.2%;
+    cursor: pointer;
+    animation: auto;
+  }
+}
+@media (max-width: 1000px) {
+  .dropdown-menu {
+    left: 65%;
+    position: absolute !important;
+    top: 98% !important;
+    /* right: 1.5%; */
+    z-index: 1000 !important;
+    /* float: right!important; */
+    /* min-width: 0rem!important; */
+    /* padding: 0.5rem 0!important; */
+    /* margin: 0.125rem 0 0!important; */
+    /*font-size: 1rem!important;*/
+    color: #ffffff !important;
+    text-align: left !important;
+    list-style: none;
+    background-color: #fff !important;
+    border-radius: 0px 0px 1px 10px !important;
+  }
+  .perfil_img {
+    width: 45px;
+    border-radius: 100px;
+    position: absolute;
+    right: 1.2%;
+    top: 1.2%;
+    cursor: pointer;
+    animation: auto;
+  }
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+.slider-card-usdt {
+  background-image: url(https://img.freepik.com/vector-premium/simbolo-token-atadura-icono-moneda-usdt-circulo-digital-tema-criptomoneda-sobre-fondo-azul-oro-digital-estilo-futurista-sitio-web-o-banner-copie-espacio-eps10-vectorial_337410-1040.jpg?w=2000) !important;
+  background-position-y: 50% !important;
+  background-position-x: center !important;
+}
