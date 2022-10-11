@@ -1,7 +1,6 @@
 window.addEventListener("load", function (event) {
   escritorio();
 });
-
 function editar_usuario() {
   $.ajax({
     url: "vistas/modificar.php",

@@ -12,7 +12,7 @@ if (true) {
         $id_user = $data[1];
         $monto = $data['roi_diario'];
         $porciento = $data['porciento'];
-        $fecha = date('Y-m-d h:i');
+        $fecha = date('Y-m-d h:i a');
         /// actualizo la membresia con el monto
         $update = "UPDATE `contractos` SET `recibido`=`recibido`+$monto WHERE `id`=$id";
         mysqli_query($conexion, $update);

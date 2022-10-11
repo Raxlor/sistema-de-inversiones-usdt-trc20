@@ -56,7 +56,7 @@ include '../../vistas/asset/header.html';
                                 <a class="btn btn-dark" href="javascript:void(0)" onclick="deposito()">Depositar <i class="fas fa-money-check"></i></a>
                             </div>
                             <div class="col-6">
-                                <a class="btn btn-danger " href="javascript:Mantenimiento()">Referidos</a>
+                                <a class="btn btn-dark " href="javascript:Mantenimiento()">Retirar <i class="fas fa-handshake"></i></a>
                             </div>
                         </div>
                     </div>
