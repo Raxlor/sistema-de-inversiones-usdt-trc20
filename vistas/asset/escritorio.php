@@ -9,6 +9,7 @@ $query = mysqli_query($conexion, $sentence);
 $data_user = mysqli_fetch_array($query);
 include '../../vistas/asset/header.html';
 ?>
+
 <main class="custom-height">
     <!-- balance start -->
     <div class="container">
