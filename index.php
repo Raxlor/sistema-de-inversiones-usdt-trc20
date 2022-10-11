@@ -10,13 +10,9 @@ include 'assets/db/db.php';
 if (isset($_GET['deslog'])) {
     session_destroy();
     header('location: /');
-} elseif (isset($_SESSION['id_acceso_cliente'])) {
+}
+elseif (isset($_SESSION['id_acceso_cliente'])) {
 
- /* Obtener los datos del usuario de la base de datos. */
-    $id = $_SESSION['id_acceso_cliente'];
-    $sentence  = "SELECT * FROM `usuario` WHERE `id`=$id";
-    $query = mysqli_query($conexion, $sentence);
-    $data_user = mysqli_fetch_array($query);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -24,8 +20,12 @@ if (isset($_GET['deslog'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
-    <title><?php print $name_Web_title; ?></title>
-    <link rel="icon" href="https://smartblessingcloud.com/wp-content/uploads/2022/09/cropped-cropped-logo-icon-32x32.png" sizes="32x32">
+    <title>
+        <?php print $name_Web_title; ?>
+    </title>
+    <link rel="icon"
+        href="https://smartblessingcloud.com/wp-content/uploads/2022/09/cropped-cropped-logo-icon-32x32.png"
+        sizes="32x32">
     <link rel="stylesheet" href="assets/css/vendor.css">
     <link rel="stylesheet" href="assets/css/responsive.css">
     <link rel="stylesheet" href="assets/css/style.css">
@@ -45,7 +45,14 @@ if (isset($_GET['deslog'])) {
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/js/bootstrap.min.js"
         integrity="sha384-vZ2WRJMwsjRMW/8U7i6PWi6AlO1L79snBrmgiDpgIWJ82z8eA5lenwvxbMV1PAh7" crossorigin="anonymous">
 
-    </script>
+        </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.4.37/sweetalert2.css"
+        integrity="sha512-XUrMHw+dQMt2eVDMOvfUNxMhe5oUvZLU1krzGAXFiY4CGV4mHEm9K4JVJj1Kw3VekCOpMVDCPL3HJ1Eqw6pD9A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.4.37/sweetalert2.min.js"
+        integrity="sha512-hMhiMG2V37nTipBqREV4+PdbKWnM3qXH9JPcD4s+YC9FStVfOMAyPvZ5tWx/SacBtHjTSsVvx7lg6CBUox1ZEA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
     <!-- JavaScript -->
     <script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
     <!-- CSS -->
@@ -61,17 +68,27 @@ if (isset($_GET['deslog'])) {
     <script src="https://cdn.datatables.net/responsive/2.3.0/js/dataTables.responsive.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <style>
-    .ajs-message {
-        border-radius: 10px !important;
-    }
+        .ajs-message {
+            border-radius: 10px !important;
+        }
+
+        .no-border {
+            border: 0 !important;
+        }
+
+        .swal2-html-container {
+            overflow: inherit !important;
+        }
     </style>
 </head>
 
 <body id="body-global">
 </body>
+
 </html>
 <?php
-} else {
+}
+else {
     include_once 'vistas/login.php';
 }
 
