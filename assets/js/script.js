@@ -33,7 +33,7 @@ function deposito() {
   $.ajax({
     type: "POST",
     url: "../vistas/asset/deposito.php",
-    beforeSend: function () { },
+    beforeSend: function () {},
     success: function (resp) {
       $("#body-global").html(resp);
     },
@@ -234,11 +234,41 @@ setInterval(() => {
     },
   });
 }, 4500);
+function info_membresia(e) {
+  if (e > 0) {
+    var formData = {
+      id: e,
+    };
+    $.ajax({
+      type: "POST",
+      data: formData,
+      url: "../../control/helpers/info_productos.php",
+      beforeSend: function () {},
+      success: function (resp) {
+        Swal.fire({
+          heightAuto: false,
+          backdrop:false,
+          title: "Información de beneficios",
+          iconHtml: '<i class="fas fa-piggy-bank fx-4"></i>',
 
+          iconColor: "rgb(62 185 15 / 70%)",
+          html: resp,
+          customClass: {
+            icon: "no-border",
+          },
+        });
+      },
+      error: function (error) {
+        alertify.error(error);
+      },
+    });
+  }
+}
 /* It's a function that loads a page into a div. */
 setInterval(() => {
   $.ajax({
     type: "POST",
+
     url: "../control/helpers/mensajes.php",
     success: function (repuesta) {
       if (repuesta.razon === "Deposito") {
@@ -262,7 +292,7 @@ function inversion() {
   $.ajax({
     type: "POST",
     url: "../vistas/asset/inversion.php",
-    beforeSend: function () { },
+    beforeSend: function () {},
     success: function (resp) {
       $("#body-global").html(resp);
     },
@@ -278,7 +308,7 @@ function perfil() {
   $.ajax({
     type: "POST",
     url: "../vistas/asset/perfil.php",
-    beforeSend: function () { },
+    beforeSend: function () {},
     success: function (resp) {
       $("#body-global").html(resp);
     },
@@ -292,6 +322,8 @@ function perfil() {
  * based on the response from the PHP script.
  */
 function activar_form_inv() {
+  // deshabilito el btn para evitar que se duplique aunque le descontara igual y no procedera si esta sobre-pasada
+  $(".btn").attr("disabled", true);
   var formData = {
     mont_id: $("#mont_id").val(),
     produc_id: $("#produc_id").val(),
@@ -311,12 +343,13 @@ function activar_form_inv() {
       alertify.notify(data.mensaje, "error", 3, function () {
         //void()
       });
+      $(".btn").removeAttr("disabled");
     }
   });
 }
 function waterpercent(value) {
-  $('#contrato').removeAttr('hidden');
-  $('#spinner-load-generar-contrato').attr('hidden', true);
+  $("#contrato").removeAttr("hidden");
+  $("#spinner-load-generar-contrato").attr("hidden", true);
   if (value > 0) {
   } else {
     cnt.innerHTML = 0;
@@ -326,8 +359,10 @@ function waterpercent(value) {
   var interval;
   interval = setInterval(function () {
     percent++;
-    cnt.innerHTML = percent + '%';
-    $('.cloud').css(`background: -webkit-linear-gradient(top,rgb(27, 133, 185) 5%, #f1f1f1 100%);
+    cnt.innerHTML = percent + "%";
+    $(
+      ".cloud"
+    ).css(`background: -webkit-linear-gradient(top,rgb(27, 133, 185) 5%, #f1f1f1 100%);
      background: -o - linear - gradient(top, rgb(27, 133, 185) 5 %, #f1f1f1 100 %);
     background: -ms - linear - gradient(top, rgb(27, 133, 185) 5 %, #f1f1f1 100 %);
     background: linear - gradient(top, rgb(27, 133, 185) 5 %, #f1f1f1 100 %);`);
@@ -336,7 +371,3 @@ function waterpercent(value) {
     }
   }, 120);
 }
-
-
-
-
