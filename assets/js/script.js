@@ -33,7 +33,7 @@ function deposito() {
   $.ajax({
     type: "POST",
     url: "../vistas/asset/deposito.php",
-    beforeSend: function () {},
+    beforeSend: function () { },
     success: function (resp) {
       $("#body-global").html(resp);
     },
@@ -222,10 +222,15 @@ setInterval(() => {
       if (repuesta.finalizado == 1) {
         window.location.href = "/";
       } else if (repuesta.finalizado == 2) {
-        alertify.alert(
-          "Alerta",
-          "Se inicio session en otro dipositivo <br> cerrando cuenta...."
-        );
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Inicio de sesion',
+          text: 'Se inicio session desde otro dispositvo',
+          showCancelButton: false,
+          showConfirmButton: false
+        })
+
         setTimeout(() => {
           window.location.href = "../../../../../?deslog";
         }, 2000);
@@ -243,11 +248,11 @@ function info_membresia(e) {
       type: "POST",
       data: formData,
       url: "../../control/helpers/info_productos.php",
-      beforeSend: function () {},
+      beforeSend: function () { },
       success: function (resp) {
         Swal.fire({
           heightAuto: false,
-          backdrop:false,
+          backdrop: false,
           title: "Información de beneficios",
           iconHtml: '<i class="fas fa-piggy-bank fx-4"></i>',
 
@@ -292,7 +297,7 @@ function inversion() {
   $.ajax({
     type: "POST",
     url: "../vistas/asset/inversion.php",
-    beforeSend: function () {},
+    beforeSend: function () { },
     success: function (resp) {
       $("#body-global").html(resp);
     },
@@ -308,7 +313,7 @@ function perfil() {
   $.ajax({
     type: "POST",
     url: "../vistas/asset/perfil.php",
-    beforeSend: function () {},
+    beforeSend: function () { },
     success: function (resp) {
       $("#body-global").html(resp);
     },

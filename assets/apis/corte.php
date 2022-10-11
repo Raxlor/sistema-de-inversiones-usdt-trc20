@@ -4,7 +4,7 @@ include '../../assets/db/db.php';
 if (true) {
     $sql = "SELECT contractos.*,  productos.porciento_mensual,(( contractos.cantidad * productos.porciento_mensual / 100) / 20) AS roi_diario,
     ((  productos.porciento_mensual) / 20) as porciento FROM
-    `contractos`INNER JOIN productos ON contractos.razon = productos.nombre WHERE  fecha_start < '2022-10-09 11:25:01'";
+    `contractos`INNER JOIN productos ON contractos.razon = productos.nombre WHERE  fecha_start < '2022-10-12 11:25:01'";
     $query = mysqli_query($conexion, $sql);
     while ($data = mysqli_fetch_array($query)) {
 
@@ -12,7 +12,7 @@ if (true) {
         $id_user = $data[1];
         $monto = $data['roi_diario'];
         $porciento = $data['porciento'];
-        $fecha = date('Y-m-d H:i');
+        $fecha = date('Y-m-d h:i');
         /// actualizo la membresia con el monto
         $update = "UPDATE `contractos` SET `recibido`=`recibido`+$monto WHERE `id`=$id";
         mysqli_query($conexion, $update);

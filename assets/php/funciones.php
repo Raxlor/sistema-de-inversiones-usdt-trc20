@@ -4,18 +4,6 @@ require_once '../../PHPMailer/SMTP.php'; ///dependencia para uso de email
 require_once '../../PHPMailer/Exception.php'; ///dependencia para uso de emal
 use PHPMailer\PHPMailer\PHPMailer; ///dependencia para uso de email
 
-/**
- * Envía un correo electrónico.
- * 
- * Args:
- *   Subject: El asunto del correo electrónico.
- *   email: La dirección de correo electrónico del destinatario.
- *   mensaje: El mensaje a enviar.
- * 
- * Returns:
- *   Error de la aplicación de correo: SMTP connect() falló.
- * https://github.com/PHPMailer/PHPMailer/wiki/Solución de problemas
- */
 function enviar_email($Subject, $email, $mensaje)
 {
     require '../../vendor/autoload.php';
@@ -43,20 +31,15 @@ function enviar_email($Subject, $email, $mensaje)
     $mail->Subject = $Subject; // envio el subject
     $mail->addAddress($email); // email de quien evia a la red
     $mail->msgHTML($mensaje);
-
+    # code...
     if (!$mail->send()) {
         $informacion =  'Mailer Error: ' . $mail->ErrorInfo;
-        return $informacion;
+    } else {
+        $informacion = 'Email enviado';
     }
+    return $informacion;
 };
 
-/**
- * Si el usuario está detrás de un proxy, la dirección IP del usuario es la primera dirección IP en el
- * encabezado HTTP_X_FORWARDED_FOR. De lo contrario, la dirección IP del usuario es REMOTE_ADDR.
- * 
- * Returns:
- *   La dirección IP del usuario.
- */
 function get_client_ip_env()
 {
     $ipaddress = '';
@@ -78,16 +61,7 @@ function get_client_ip_env()
     return $ipaddress;
 }
 
-/**
- * Genera un número aleatorio entre 0 y la longitud de la cadena del generador, luego usa ese número
- * para elegir un carácter de la cadena del generador.
- * 
- * Args:
- *   n: La duración de la OTP.
- * 
- * Returns:
- *   Un número aleatorio.
- */
+// Function to generate OTP
 function generateNumericOTP($n)
 {
 
@@ -112,15 +86,6 @@ function generateNumericOTP($n)
     // Return result
     return $result;
 }
-/**
- * Genera una cadena aleatoria de caracteres hexadecimales.
- * 
- * Args:
- *   n: El número de bytes a generar. Debe ser un entero positivo.
- * 
- * Returns:
- *   Una cadena de caracteres aleatorios.
- */
 function generarhash($n)
 {
     $result = "";
@@ -128,16 +93,11 @@ function generarhash($n)
     $result = bin2hex(random_bytes($n));
     return $result;
 }
-
 /**
- * Deshabilita todos los códigos anteriores excepto el último.
- *
+ * It gets the last code generated for a user, and then disables all the other codes for that user.
+ * 
  * Args:
- *   id: La identificación del usuario
- */
-/**
- * Deshabilita todos los códigos anteriores excepto el último.
- * La identificación del usuario
+ *   id: The id of the user
  */
 function deshabilitar_codigos_anteriores($id)
 {
@@ -150,4 +110,44 @@ function deshabilitar_codigos_anteriores($id)
 
     $sql = "UPDATE `codigos_de_restablecimiento` SET `estado` = '1' WHERE `codigos_de_restablecimiento`.`id` != $id_last";
     mysqli_query($conexion, $sql);
+}
+function validacion_de_inversiones($disponibilidad, $utilizado, $capital_total, $objetivo_capital, $multiplo, $mindeposito, $deposito)
+{
+    $respuesta_ = array();
+
+    if ($disponibilidad != 0) { //si disponibilidad no es 0 tiene un limite entonces procedo a asegurarme que no este lleno para proceder con la inversion
+        if ($utilizado >= $disponibilidad) {
+            $repuesta_disponibilidad = 'Falso'; //tiene limite
+        } else {
+            $repuesta_disponibilidad = 'Verdadero'; // si tiene limite pero aun no llega a ese limite por ende lo dejo pasar
+        }
+    } else {
+        $repuesta_disponibilidad = 'Verdadero'; // se supone que no tiene limite , y no es nesesario verificar si paso o no
+    }
+
+    if ($objetivo_capital != 0) { // si el objetivo no es 0, se entiende que se debe verificar si sobrepaso el limite
+        if (($capital_total + $deposito) > $objetivo_capital) {
+            $repuesta_capital = 'Falso'; // no lo dejo pasar
+        } else {
+            $repuesta_capital = 'Verdadero'; // si tiene limite pero la suma de el deposito y el total no superan el limite de holders
+        }
+    } else {
+        $repuesta_capital = 'Verdadero';
+    }
+
+    //verificacion de multiplo
+    if (($deposito % $multiplo) == 0) { // verificio si es multiplo de x numero
+        $repuesta_multiplo = 'Verdadero';
+    } else {
+        $repuesta_multiplo = 'Falso';
+    }
+
+    if ($mindeposito <= $deposito) { // verifico que el deposito sea el por arriba del minimo o igual
+        $respuesta_min_deposito = 'Verdadero';
+    } else {
+        $respuesta_min_deposito = 'Falso';
+    }
+
+    $respuesta_ = ['limite' => $repuesta_disponibilidad, 'limite_holder' => $repuesta_capital, 'multiplo' => $repuesta_multiplo, 'min_deposito' => $respuesta_min_deposito];
+    return   json_encode($respuesta_);
 }
