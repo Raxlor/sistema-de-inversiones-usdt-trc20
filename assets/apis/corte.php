@@ -4,7 +4,7 @@ include '../../assets/db/db.php';
 if (true) {
     $sql = "SELECT contractos.*,  productos.porciento_mensual,(( contractos.cantidad * productos.porciento_mensual / 100) / 20) AS roi_diario,
     ((  productos.porciento_mensual) / 20) as porciento FROM
-    `contractos`INNER JOIN productos ON contractos.razon = productos.nombre WHERE  fecha_start < '2022-10-12 11:25:01'";
+    `contractos`INNER JOIN productos ON contractos.razon = productos.nombre WHERE  fecha_start < '2022-10-15 11:25:01'";
     $query = mysqli_query($conexion, $sql);
     while ($data = mysqli_fetch_array($query)) {
 

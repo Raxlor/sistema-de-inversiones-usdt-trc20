@@ -27,7 +27,7 @@
 
 </head>
 
-<body>
+<body >
     <div>
         <div class="signin-area">
             <div class="container">
@@ -50,9 +50,18 @@
                             </label>
                             <div class="" style="text-align-last: center;">
                                 <p class="small mb-0 pb-lg-0"><a class="text-white-50"
-                                        href="javascript:resert_password()">Forgot password?</a></p>
+                                        href="javascript:resert_password()">¿Se te olvidó tu contraseña?</a></p>
                             </div>
                             <button type="submit" class="btn btn-smart-login text-white">Entrar </button>
+                            <div style="text-align: center; margin-top:20px;">
+                                <span class="mt-2" style="text-align: center;">
+                                    ¿No tienes una cuenta?
+                                    <a href="/auth/register"><strong class="d-none d-sm-inline">
+                                            Crea una cuenta
+                                        </strong></a>
+                                    </a>
+                                </span>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -65,6 +74,7 @@
             setTimeout(() => {
                 alertify.set('notifier', 'position', 'top-center');
             }, 500);
+
             function resert_password() {
                 Swal.fire({
                     title: 'Correo eletronico de la cuenta',
