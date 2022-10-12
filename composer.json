@@ -1,5 +1,8 @@
 {
-    "require": {
-        "phpmailer/phpmailer": "^6.6","vlucas/phpdotenv":"^2.0","mongodb/mongodb":"^1.13"
-    }
-    }
+  "require": {
+    "phpmailer/phpmailer": "^6.6",
+    "vlucas/phpdotenv": "^2.0",
+    "alcaeus/mongo-php-adapter": "^1.2",
+    "mongodb/mongodb": "^1.13"
+  }
+}
