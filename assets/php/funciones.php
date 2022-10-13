@@ -4,23 +4,33 @@ require_once '../../PHPMailer/SMTP.php'; ///dependencia para uso de email
 require_once '../../PHPMailer/Exception.php'; ///dependencia para uso de emal
 use PHPMailer\PHPMailer\PHPMailer; ///dependencia para uso de email
 
+
 function enviar_email($Subject, $email, $mensaje)
 {
+    $servidor = false;
     require '../../vendor/autoload.php';
     $mail = new PHPMailer();
     //Tell PHPMailer to use SMTP
     $mail->isSMTP();
-    $email_institucional = 'system@sporouscapital.com.do'; // correo para smpt
-    $password_institucional = 'kezbjjkdnaskttad'; /// contraseña del smtp
-    $nombre_envio_mail_smtp = 'sistema';
+    $email_institucional = 'smartblessingcloud@gmail.com'; // correo para smpt
+    $password_institucional = 'fnoqqtypwyjgvltw'; /// contraseña del smtp
+    $nombre_envio_mail_smtp = 'SBC';
     $SMTPAuth_config = true; //conguraciones de seguridad de smtp
     $SMTPAutoTLS_config = true; //conguraciones de seguridad de smtp
 
     $mail->CharSet = 'UTF-8'; // modificar en conexion
     $mail->Encoding = 'quoted-printable'; // modificar en conexion
     $mail->SMTPDebug = 0; // modificar en conexion
-    $mail->Host  = 'smtp.gmail.com'; // modificar en conexion
-    $mail->Port = '587'; // modificar en conexion
+
+    if ($servidor) {
+        $mail->Host = 'mail.smartblessingcloud.com'; // modificar en conexion
+        $mail->Port = '465'; // modificar en conexion
+    }
+    else {
+        $mail->Host = 'smtp.gmail.com'; // modificar en conexion
+        $mail->Port = '587'; // modificar en conexion
+    }
+
     $mail->SMTPAuth = $SMTPAuth_config; // modificar en conexion
     $mail->SMTPAutoTLS = $SMTPAutoTLS_config; // modificar en conexion
     $mail->Username = $email_institucional; // modificar en conexion
@@ -33,12 +43,14 @@ function enviar_email($Subject, $email, $mensaje)
     $mail->msgHTML($mensaje);
     # code...
     if (!$mail->send()) {
-        $informacion =  'Mailer Error: ' . $mail->ErrorInfo;
-    } else {
+        $informacion = 'Mailer Error: ' . $mail->ErrorInfo;
+    }
+    else {
         $informacion = 'Email enviado';
     }
     return $informacion;
-};
+}
+;
 
 function get_client_ip_env()
 {
@@ -118,36 +130,93 @@ function validacion_de_inversiones($disponibilidad, $utilizado, $capital_total, 
     if ($disponibilidad != 0) { //si disponibilidad no es 0 tiene un limite entonces procedo a asegurarme que no este lleno para proceder con la inversion
         if ($utilizado >= $disponibilidad) {
             $repuesta_disponibilidad = 'Falso'; //tiene limite
-        } else {
+        }
+        else {
             $repuesta_disponibilidad = 'Verdadero'; // si tiene limite pero aun no llega a ese limite por ende lo dejo pasar
         }
-    } else {
+    }
+    else {
         $repuesta_disponibilidad = 'Verdadero'; // se supone que no tiene limite , y no es nesesario verificar si paso o no
     }
 
     if ($objetivo_capital != 0) { // si el objetivo no es 0, se entiende que se debe verificar si sobrepaso el limite
         if (($capital_total + $deposito) > $objetivo_capital) {
             $repuesta_capital = 'Falso'; // no lo dejo pasar
-        } else {
+        }
+        else {
             $repuesta_capital = 'Verdadero'; // si tiene limite pero la suma de el deposito y el total no superan el limite de holders
         }
-    } else {
+    }
+    else {
         $repuesta_capital = 'Verdadero';
     }
 
     //verificacion de multiplo
     if (($deposito % $multiplo) == 0) { // verificio si es multiplo de x numero
         $repuesta_multiplo = 'Verdadero';
-    } else {
+    }
+    else {
         $repuesta_multiplo = 'Falso';
     }
 
     if ($mindeposito <= $deposito) { // verifico que el deposito sea el por arriba del minimo o igual
         $respuesta_min_deposito = 'Verdadero';
-    } else {
+    }
+    else {
         $respuesta_min_deposito = 'Falso';
     }
 
     $respuesta_ = ['limite' => $repuesta_disponibilidad, 'limite_holder' => $repuesta_capital, 'multiplo' => $repuesta_multiplo, 'min_deposito' => $respuesta_min_deposito];
-    return   json_encode($respuesta_);
+    return json_encode($respuesta_);
+}
+
+
+function Registro_usuario($username, $email, $gmail, $password)
+{
+    $info_existencia = consultar_existencia($username, $email);
+    $info_existencia = json_decode($info_existencia);
+
+    if ($info_existencia->status == 1) {
+
+    }
+    else {
+
+    }
+}
+
+/**
+ * Devuelve una matriz codificada en JSON con una clave de estado y una clave sql_data. La clave de
+ * estado es 0 o 1. La clave sql_data es una matriz de los resultados de la consulta.
+ * 
+ * Args:
+ *   username: el nombre de usuario del usuario
+ *   email: La dirección de correo electrónico del usuario.
+ * 
+ * Returns:
+ *  
+ * <code>{"status":"1","sql_data":["1","username","alexander","admin@gmail.com","password","fecha","estado","disponible","maximo","hash_session"}
+ */
+function consultar_existencia($username, $email)
+{
+    // implementacion de estatus personal si es  0 es que no tiene contenido y si es uno procedo a mostrar la informacion optienida
+    /* Incluyendo el archivo `db.php` del directorio `../../assets/db/`. */
+    require '../../assets/db/db.php';
+    /* Creando una matriz vacía. */
+    $respuesta_ = array();
+    /* Una consulta SQL que va seleccionando todos los datos de la tabla `usuario` donde la columna
+     `nick` es igual al valor de la variable `` o la columna `email` es igual al valor de la
+     variable ` `. */
+    $sql = "SELECT * FROM `usuario` WHERE `nick`='$username' or `email`='$email'";
+    /* Obtener la primera fila del resultado de la consulta. */
+    $data_sql = mysqli_fetch_row(mysqli_query($conexion, $sql));
+    /* Comprobando si la consulta devolvió algún dato. Si lo hiciera, devolverá los datos en la clave
+     `sql_data`. Si no fuera así, devolverá `0` en la clave `status`. */
+    if (!is_null($data_sql)) {
+        $respuesta_ = ['status' => '1', 'sql_data' => $data_sql];
+    }
+    else {
+        $respuesta_ = ['status' => '0'];
+    }
+    /* Devolver una cadena codificada en JSON. */
+    return json_encode($respuesta_);
 }

@@ -4865,9 +4865,9 @@ body {
 @media (min-width: 1000px) {
   .box {
     height: 110px;
-     width: 110px;
-    
-    position: absolute; 
+    width: 110px;
+
+    position: absolute;
     /* top: 57%;
     left: 70%; */
     /* transform: translate(-50%, -50%); */
@@ -4954,4 +4954,7 @@ body {
   100% {
     transform: translate(50%, 0);
   }
+}
+.red {
+  color: red;
 }
