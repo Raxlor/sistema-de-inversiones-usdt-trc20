@@ -1954,7 +1954,7 @@ ul {
 /************* signin ***********/
 .contact-form-inner {
   background: #fff;
-  height: 420px;
+  height: auto;
   padding: 42px 17px;
   border-radius: 4%;
   box-shadow: 3px 4px 20px 0px #2ee0de3b;
