@@ -260,3 +260,43 @@ $("#login_form").submit(function () {
   }
 });
 
+$(function () {
+  $("#register_form").on("submit", function (e) {
+    $('.btn').attr('disabled', true);
+    /* Prevención de la acción predeterminada del formulario. */
+    e.preventDefault();
+    /* Crear un nuevo objeto FormData, que es una forma de enviar fácilmente datos de formulario a un
+    servidor. */
+    var formData = new FormData(document.getElementById("register_form"));
+    /* Envío de los datos del formulario al servidor. */
+    $.ajax({
+      url: "../../control/forms_proceso/form_registro_usuario.php",
+      type: "post",
+      dataType: "json",
+      data: formData,
+      cache: false,
+      contentType: false,
+      processData: false,
+      beforeSend: function () {
+        //nada de momento
+      },
+    })
+      /* Una función que se ejecuta cuando se realiza la solicitud. */
+      .done(function (res) {
+        if (res.a == "1") {
+          // Mostramos el mensaje 'Tu Mensaje ha sido enviado Correctamente !' 
+          $(".msg").html(res.b);
+          $("#register_form").trigger("reset");
+          setTimeout(() => {
+            $('#registrar').removeAttr('disabled');
+          }, 1500);
+        } else {
+          $(".msg").html(res.b);
+        }
+      })
+      // Mensaje de error al enviar el formulario 
+      .fail(function (res) {
+        $(".msg").html(res.b);
+      });
+  });
+});
