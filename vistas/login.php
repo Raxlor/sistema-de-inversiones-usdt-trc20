@@ -63,7 +63,7 @@
         <script src="assets/js/vendor.js"></script>
 
         <script src="assets/js/main.js"></script>
-        <script src="../assets/js/validador-password/jquery.password-validation.js"></script>
+        <script src="../assets/js/puglins/jquery.password-validation.js"></script>
 
         <script>
             setTimeout(() => {
