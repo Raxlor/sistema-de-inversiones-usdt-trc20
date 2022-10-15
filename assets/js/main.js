@@ -247,7 +247,7 @@ $("#login_form").submit(function () {
         if (resp.access === true) {
           alertify.success("Acceso aprobado");
           setTimeout(() => {
-            location.href = '/';
+            location.href = "/";
           }, 1000);
         } else {
           alertify.error("No hay usuario con eso datos, intente nuevamente");
@@ -262,7 +262,7 @@ $("#login_form").submit(function () {
 
 $(function () {
   $("#register_form").on("submit", function (e) {
-    $('.btn').attr('disabled', true);
+    $(".btn").attr("disabled", true);
     /* Prevención de la acción predeterminada del formulario. */
     e.preventDefault();
     /* Crear un nuevo objeto FormData, que es una forma de enviar fácilmente datos de formulario a un
@@ -283,20 +283,38 @@ $(function () {
     })
       /* Una función que se ejecuta cuando se realiza la solicitud. */
       .done(function (res) {
-        if (res.a == "1") {
-          // Mostramos el mensaje 'Tu Mensaje ha sido enviado Correctamente !' 
-          $(".msg").html(res.b);
+        if (res.status) {
+          alertify.success(res.msg);
           $("#register_form").trigger("reset");
-          setTimeout(() => {
-            $('#registrar').removeAttr('disabled');
-          }, 1500);
         } else {
-          $(".msg").html(res.b);
+          if (res.msg !== "Recuperar") {
+            alertify.error(`El ` + res.msg + ` no se encuentra disponible`);
+          } else {
+            Swal.fire({
+              icon: "question",
+              title: "¿Tienes problemas?",
+              text: "Encontramos que correo y nombre de usuario estan en nuestra base de datos, Quiere recuperar la contraseña de su cuenta o tiene algun tipo de problema",
+              showCancelButton: true,
+              showConfirmButton: true,
+              confirmButtonText: "Si, Por favor",
+              denyButtonText: `No, Gracias`,
+            }).then((result) => {
+              /* Read more about isConfirmed, isDenied below */
+              if (result.isConfirmed) {
+                location.href='/?restablecer';
+              } else if (result.isDenied) {
+               
+              }
+            });
+          }
         }
+        setTimeout(() => {
+          $("#registrar").removeAttr("disabled");
+        }, 100);
       })
-      // Mensaje de error al enviar el formulario 
+      // Mensaje de error al enviar el formulario
       .fail(function (res) {
-        $(".msg").html(res.b);
+        $(".msg").html(res);
       });
   });
 });

@@ -1,14 +1,15 @@
 <?php
-require_once '../../PHPMailer/PHPMailer.php'; ///dependencia para uso de email
-require_once '../../PHPMailer/SMTP.php'; ///dependencia para uso de email
-require_once '../../PHPMailer/Exception.php'; ///dependencia para uso de emal
-use PHPMailer\PHPMailer\PHPMailer; ///dependencia para uso de email
 
+require $_SERVER['DOCUMENT_ROOT'] . '../../vendor/autoload.php';
+require $_SERVER['DOCUMENT_ROOT'] . '../../PHPMailer/PHPMailer.php'; ///dependencia para uso de email
+require $_SERVER['DOCUMENT_ROOT'] . '../../PHPMailer/SMTP.php'; ///dependencia para uso de email
+require $_SERVER['DOCUMENT_ROOT'] . '../../PHPMailer/Exception.php'; ///dependencia para uso de emal
+use PHPMailer\PHPMailer\PHPMailer; ///dependencia para uso de email
 
 function enviar_email($Subject, $email, $mensaje)
 {
+
     $servidor = false;
-    require '../../vendor/autoload.php';
     $mail = new PHPMailer();
     //Tell PHPMailer to use SMTP
     $mail->isSMTP();
@@ -25,8 +26,7 @@ function enviar_email($Subject, $email, $mensaje)
     if ($servidor) {
         $mail->Host = 'mail.smartblessingcloud.com'; // modificar en conexion
         $mail->Port = '465'; // modificar en conexion
-    }
-    else {
+    } else {
         $mail->Host = 'smtp.gmail.com'; // modificar en conexion
         $mail->Port = '587'; // modificar en conexion
     }
@@ -44,13 +44,11 @@ function enviar_email($Subject, $email, $mensaje)
     # code...
     if (!$mail->send()) {
         $informacion = 'Mailer Error: ' . $mail->ErrorInfo;
-    }
-    else {
+    } else {
         $informacion = 'Email enviado';
     }
     return $informacion;
-}
-;
+};
 
 function get_client_ip_env()
 {
@@ -130,39 +128,33 @@ function validacion_de_inversiones($disponibilidad, $utilizado, $capital_total, 
     if ($disponibilidad != 0) { //si disponibilidad no es 0 tiene un limite entonces procedo a asegurarme que no este lleno para proceder con la inversion
         if ($utilizado >= $disponibilidad) {
             $repuesta_disponibilidad = 'Falso'; //tiene limite
-        }
-        else {
+        } else {
             $repuesta_disponibilidad = 'Verdadero'; // si tiene limite pero aun no llega a ese limite por ende lo dejo pasar
         }
-    }
-    else {
+    } else {
         $repuesta_disponibilidad = 'Verdadero'; // se supone que no tiene limite , y no es nesesario verificar si paso o no
     }
 
     if ($objetivo_capital != 0) { // si el objetivo no es 0, se entiende que se debe verificar si sobrepaso el limite
         if (($capital_total + $deposito) > $objetivo_capital) {
             $repuesta_capital = 'Falso'; // no lo dejo pasar
-        }
-        else {
+        } else {
             $repuesta_capital = 'Verdadero'; // si tiene limite pero la suma de el deposito y el total no superan el limite de holders
         }
-    }
-    else {
+    } else {
         $repuesta_capital = 'Verdadero';
     }
 
     //verificacion de multiplo
     if (($deposito % $multiplo) == 0) { // verificio si es multiplo de x numero
         $repuesta_multiplo = 'Verdadero';
-    }
-    else {
+    } else {
         $repuesta_multiplo = 'Falso';
     }
 
     if ($mindeposito <= $deposito) { // verifico que el deposito sea el por arriba del minimo o igual
         $respuesta_min_deposito = 'Verdadero';
-    }
-    else {
+    } else {
         $respuesta_min_deposito = 'Falso';
     }
 
@@ -171,17 +163,56 @@ function validacion_de_inversiones($disponibilidad, $utilizado, $capital_total, 
 }
 
 
-function Registro_usuario($username, $email, $gmail, $password)
+function cifrar($dato)
 {
+    $respuesta_ = array();
+    $respuesta_ = ['data' => openssl_encrypt($dato, "AES-128-ECB", getenv('key_cifrado'))];
+    return json_decode(json_encode($respuesta_));
+}
+
+function Registro_usuario($username, $full_name, $email, $password)
+{
+    $Exception = false;
+    $ip_user = get_client_ip_env();
+    $respuesta_ = array();
+    include  $_SERVER['DOCUMENT_ROOT'] . '../../assets/db/db.php';
     $info_existencia = consultar_existencia($username, $email);
     $info_existencia = json_decode($info_existencia);
 
-    if ($info_existencia->status == 1) {
+    if ($info_existencia->status === '0') {
+        $fecha_registro = date('Y-m-d');
+        $password = cifrar($password)->data;
+        $sql = "INSERT INTO `usuario`(`nick`, `nombre`, `email`, `contraseña`, `fecha_registro`,`ip_creacion`) VALUES ('$username','$full_name','$email','$password','$fecha_registro','$ip_user')";
+        try {
+            mysqli_query($conexion, $sql);
+        } catch (Exception $e) {
+            $Exception = true;
+             Auto_report('Excepción capturada: ' .   $e->getMessage() . "\n en ".__FILE__.' en Linia '.__LINE__);
+        }
+        if ($Exception) {
+            $respuesta_ = ['status' => false, 'msg' => 'En esto momentos no podemos hacer registro ya enviamos un  reporte al equipo de sistema, intentelo nuevamente en 5 minutos si el problema continua. comunicarse con soporte'];
+        } else {
+            $respuesta_ = ['status' => true, 'msg' => 'Registrado exitosamente, confirme su cuenta'];
+        }
+    } else {
 
+        if ($info_existencia->macth_nick == 1) {
+            $caso = 'nombre de usuario';
+        }
+        if ($info_existencia->macth_email == 1) {
+            $caso =   'Correo';
+        }
+        if ($info_existencia->macth_email == 1 &&  $info_existencia->macth_nick == 1) {
+            $caso =  "Recuperar";
+        }
+        $respuesta_ = ['status' => false, 'msg' => $caso];
     }
-    else {
-
-    }
+    return $respuesta_;
+}
+function Auto_report($Exception)
+{
+    $email='elnova205@gmail.com';
+    enviar_email('Exception-bug',$email,$Exception);
 }
 
 /**
@@ -198,9 +229,11 @@ function Registro_usuario($username, $email, $gmail, $password)
  */
 function consultar_existencia($username, $email)
 {
+    $username_macht = 0;
+    $emai_macht = 0;
     // implementacion de estatus personal si es  0 es que no tiene contenido y si es uno procedo a mostrar la informacion optienida
     /* Incluyendo el archivo `db.php` del directorio `../../assets/db/`. */
-    require '../../assets/db/db.php';
+    require  $_SERVER['DOCUMENT_ROOT'] . '../../assets/db/db.php';
     /* Creando una matriz vacía. */
     $respuesta_ = array();
     /* Una consulta SQL que va seleccionando todos los datos de la tabla `usuario` donde la columna
@@ -208,14 +241,21 @@ function consultar_existencia($username, $email)
      variable ` `. */
     $sql = "SELECT * FROM `usuario` WHERE `nick`='$username' or `email`='$email'";
     /* Obtener la primera fila del resultado de la consulta. */
+
     $data_sql = mysqli_fetch_row(mysqli_query($conexion, $sql));
+
     /* Comprobando si la consulta devolvió algún dato. Si lo hiciera, devolverá los datos en la clave
      `sql_data`. Si no fuera así, devolverá `0` en la clave `status`. */
     if (!is_null($data_sql)) {
-        $respuesta_ = ['status' => '1', 'sql_data' => $data_sql];
-    }
-    else {
-        $respuesta_ = ['status' => '0'];
+        if ($username === $data_sql[1]) {
+            $username_macht = 1;
+        }
+        if ($email === $data_sql[3]) {
+            $emai_macht = 1;
+        }
+        $respuesta_ = ['status' => '1', 'sql_data' => $data_sql, 'macth_email' => $emai_macht, 'macth_nick' => $username_macht];
+    } else {
+        $respuesta_ = ['status' => '0', 'macth_email' => $emai_macht, 'macth_nick' => $username_macht];
     }
     /* Devolver una cadena codificada en JSON. */
     return json_encode($respuesta_);
