@@ -1,12 +1,27 @@
 <?php
 
-use PHPMailer\PHPMailer\PHPMailer; ///dependencia para uso de email
+/* Importación de la biblioteca PHPMailer. */
+use PHPMailer\PHPMailer\PHPMailer;
+
+/**
+ * Envía un correo electrónico.
+ * 
+ * Args:
+ *   Subject: El asunto del correo electrónico.
+ *   email: La dirección de correo electrónico del destinatario.
+ *   mensaje: El mensaje a enviar.
+ * 
+ * Returns:
+ *   Error de la aplicación de correo: SMTP connect() falló.
+ * https://github.com/PHPMailer/PHPMailer/wiki/Solución de problemas
+ */
 function enviar_email($Subject, $email, $mensaje)
 {
-    require  (dirname(__FILE__).'/../../vendor/autoload.php');
-    require  (dirname(__FILE__).'/../../PHPMailer/PHPMailer.php'); ///dependencia para uso de email
-    require  (dirname(__FILE__).'/../../PHPMailer/SMTP.php'); ///dependencia para uso de email
-    require  (dirname(__FILE__).'/../../PHPMailer/Exception.php'); ///dependencia para uso de emal
+    /* Cargando las dependencias para PHPMailer. */
+    require(dirname(__FILE__) . '/../../vendor/autoload.php');
+    require(dirname(__FILE__) . '/../../PHPMailer/PHPMailer.php'); ///dependencia para uso de email
+    require(dirname(__FILE__) . '/../../PHPMailer/SMTP.php'); ///dependencia para uso de email
+    require(dirname(__FILE__) . '/../../PHPMailer/Exception.php'); ///dependencia para uso de emal
 
     $servidor = false;
     $mail = new PHPMailer();
@@ -47,30 +62,41 @@ function enviar_email($Subject, $email, $mensaje)
         $informacion = 'Email enviado';
     }
     return $informacion;
-};
+}
+;
 
+/**
+ * Si el usuario está detrás de un proxy, la dirección IP del usuario es la primera dirección IP en el
+ * encabezado HTTP_X_FORWARDED_FOR. De lo contrario, la dirección IP del usuario es REMOTE_ADDR.
+ * 
+ * Returns:
+ *   La dirección IP del usuario.
+ */
 function get_client_ip_env()
 {
     $ipaddress = '';
     if (getenv('HTTP_CLIENT_IP'))
-        $ipaddress = getenv('HTTP_CLIENT_IP');
-    else if (getenv('HTTP_X_FORWARDED_FOR'))
-        $ipaddress = getenv('HTTP_X_FORWARDED_FOR');
-    else if (getenv('HTTP_X_FORWARDED'))
-        $ipaddress = getenv('HTTP_X_FORWARDED');
-    else if (getenv('HTTP_FORWARDED_FOR'))
-        $ipaddress = getenv('HTTP_FORWARDED_FOR');
-    else if (getenv('HTTP_FORWARDED'))
-        $ipaddress = getenv('HTTP_FORWARDED');
-    else if (getenv('REMOTE_ADDR'))
-        $ipaddress = getenv('REMOTE_ADDR');
-    else
+        $ipaddress = getenv('HTTP_CLIENT_IP'); else if (getenv('HTTP_X_FORWARDED_FOR'))
+        $ipaddress = getenv('HTTP_X_FORWARDED_FOR'); else if (getenv('HTTP_X_FORWARDED'))
+        $ipaddress = getenv('HTTP_X_FORWARDED'); else if (getenv('HTTP_FORWARDED_FOR'))
+        $ipaddress = getenv('HTTP_FORWARDED_FOR'); else if (getenv('HTTP_FORWARDED'))
+        $ipaddress = getenv('HTTP_FORWARDED'); else if (getenv('REMOTE_ADDR'))
+        $ipaddress = getenv('REMOTE_ADDR'); else
         $ipaddress = 'UNKNOWN';
 
     return $ipaddress;
 }
 
-// Function to generate OTP
+/**
+ * Genera un número aleatorio entre 0 y la longitud de la cadena del generador, luego usa ese número
+ * para elegir un carácter de la cadena del generador.
+ * 
+ * Args:
+ *   n: La duración de la OTP.
+ * 
+ * Returns:
+ *   Un número aleatorio.
+ */
 function generateNumericOTP($n)
 {
 
@@ -95,6 +121,15 @@ function generateNumericOTP($n)
     // Return result
     return $result;
 }
+/**
+ * Genera una cadena aleatoria de caracteres hexadecimales.
+ * 
+ * Args:
+ *   n: El número de bytes a generar.
+ * 
+ * Returns:
+ *   Una cadena de caracteres aleatorios.
+ */
 function generarhash($n)
 {
     $result = "";
@@ -120,6 +155,18 @@ function deshabilitar_codigos_anteriores($id)
     $sql = "UPDATE `codigos_de_restablecimiento` SET `estado` = '1' WHERE `codigos_de_restablecimiento`.`id` != $id_last";
     mysqli_query($conexion, $sql);
 }
+/**
+ * Toma 5 parámetros y devuelve un objeto JSON con 4 propiedades
+ * 
+ * Args:
+ *   disponibilidad: La cantidad de dinero que se puede invertir en este plan.
+ *   utilizado: la cantidad de dinero que se ha invertido en el plan
+ *   capital_total: La cantidad total de capital que se ha invertido en el plan.
+ *   objetivo_capital: La cantidad total de dinero que se puede invertir en el plan.
+ *   multiplo: La cantidad de dinero que el usuario puede invertir debe ser un múltiplo de este número.
+ *   mindeposito: depósito mínimo
+ *   deposito: la cantidad de dinero que el usuario quiere invertir
+ */
 function validacion_de_inversiones($disponibilidad, $utilizado, $capital_total, $objetivo_capital, $multiplo, $mindeposito, $deposito)
 {
     $respuesta_ = array();
@@ -162,22 +209,50 @@ function validacion_de_inversiones($disponibilidad, $utilizado, $capital_total, 
 }
 
 
+/**
+ * Cifra los datos utilizando el algoritmo AES-128-ECB.
+ * 
+ * Args:
+ *   dato: Los datos a cifrar.
+ * 
+ * Returns:
+ *  
+ * {"datos":"\u0016\u0016\u0016\u0016\u0016\u0016\u0016\u0016\u0016\u0016\u0016\u0016\u0016\u0016\u0016\u0016\u0016\u0016\u
+ */
 function cifrar($dato)
-{
-    include '../../vendor/autoload.php';
+{        include '../../vendor/autoload.php';
     $dotenv = new Dotenv\Dotenv('../../.');
     $dotenv->load();
     $respuesta_ = array();
+  
     $respuesta_ = ['data' => openssl_encrypt($dato, "AES-128-ECB", getenv('key_cifrado'))];
+
     return json_decode(json_encode($respuesta_));
 }
+
+/**
+ * Toma 4 parámetros y devuelve una matriz con 2 elementos.
+ *
+ * Args:
+ *   username: El nombre de usuario del usuario.
+ *   full_name: "Juan Doe"
+ *   email: prueba@prueba.com
+ *   password: 123456
+ *
+ * Returns:
+ *   Array
+ * (
+ *     [status] => 1
+ *     [msg] => Registrado exitosamente, confirme su cuenta
+ * )
+ */
 
 function Registro_usuario($username, $full_name, $email, $password)
 {
     $Exception = false;
     $ip_user = get_client_ip_env();
     $respuesta_ = array();
-    include   '../../assets/db/db.php';
+    include '../../assets/db/db.php';
     $info_existencia = consultar_existencia($username, $email);
     $info_existencia = json_decode($info_existencia);
 
@@ -189,7 +264,7 @@ function Registro_usuario($username, $full_name, $email, $password)
             mysqli_query($conexion, $sql);
         } catch (Exception $e) {
             $Exception = true;
-            Auto_report('Excepción capturada: ' .   $e->getMessage() . "\n en " . __FILE__ . ' en Linea ' . __LINE__);
+            Auto_report('Excepción capturada: ' . $e->getMessage() . "\n en " . __FILE__ . ' en Linea ' . __LINE__);
         }
         if ($Exception) {
             $respuesta_ = ['status' => false, 'msg' => 'En esto momentos no podemos hacer registro ya enviamos un  reporte al equipo de sistema, intentelo nuevamente en 5 minutos si el problema continua. comunicarse con soporte'];
@@ -203,15 +278,21 @@ function Registro_usuario($username, $full_name, $email, $password)
             $caso = 'nombre de usuario';
         }
         if ($info_existencia->macth_email == 1) {
-            $caso =   'Correo';
+            $caso = 'Correo';
         }
-        if ($info_existencia->macth_email == 1 &&  $info_existencia->macth_nick == 1) {
-            $caso =  "Recuperar";
+        if ($info_existencia->macth_email == 1 && $info_existencia->macth_nick == 1) {
+            $caso = "Recuperar";
         }
         $respuesta_ = ['status' => false, 'msg' => $caso];
     }
     return $respuesta_;
 }
+/**
+ * Envía un correo electrónico a la dirección de correo electrónico especificada en la variable .
+ * 
+ * Args:
+ *   Exception: El objeto de excepción
+ */
 function Auto_report($Exception)
 {
     $email = 'elnova205@gmail.com';
@@ -236,7 +317,7 @@ function consultar_existencia($username, $email)
     $emai_macht = 0;
     // implementacion de estatus personal si es  0 es que no tiene contenido y si es uno procedo a mostrar la informacion optienida
     /* Incluyendo el archivo `db.php` del directorio `../../assets/db/`. */
-    require   '../../assets/db/db.php';
+    require '../../assets/db/db.php';
     /* Creando una matriz vacía. */
     $respuesta_ = array();
     /* Una consulta SQL que va seleccionando todos los datos de la tabla `usuario` donde la columna
@@ -264,47 +345,96 @@ function consultar_existencia($username, $email)
     return json_encode($respuesta_);
 }
 
+/**
+ * Toma el nombre de usuario y el correo electrónico del usuario y envía un correo electrónico al
+ * usuario con un enlace para activar su cuenta.
+ * 
+ * Args:
+ *   username: El nombre de usuario del usuario.
+ *   email: La dirección de correo electrónico del usuario.
+ */
 function verificar_cuenta($username, $email)
 {
-    require   '../../assets/db/db.php';
+    require '../../assets/db/db.php';
 
     /* la id 3 pertenece a esa plantilla */
     $sql = "SELECT * FROM `plantillas_email` where id=3";
     $data = mysqli_fetch_array(mysqli_query($conexion, $sql));
-    $html=$data['estructura'];
+    $html = $data['estructura'];
     $codigo = generarhash(24);
     $sql = "SELECT * FROM `usuario` WHERE nick='$username'";
-    $data=mysqli_fetch_array(mysqli_query($conexion,$sql));
-    $id=$data[0];
-    $nombre=$data[2];
+    $data = mysqli_fetch_array(mysqli_query($conexion, $sql));
+    $id = $data[0];
+    $nombre = $data[2];
     insertar_codigo_de_activacion($id, $codigo);
 
     /* Replacing the values in the array with the values in the database. */
-    $palabras_claves = array("@nombre@","@link@");
-    $palabras_claves_changer = array($nombre,'https://app.smartblessingcloud.com/?verificar=' . $codigo);
+    $palabras_claves = array("@nombre@", "@link@");
+    $palabras_claves_changer = array($nombre, 'https://app.smartblessingcloud.com/?verificar=' . $codigo);
     $html = str_replace($palabras_claves, $palabras_claves_changer, $html);
     /* Sending the email. */
     enviar_email('Activar cuenta', $email, $html);
 }
+/**
+ * Inserta una fila en la base de datos.
+ * 
+ * Args:
+ *   id: La identificación del usuario
+ *   codigo: El código que se insertará en la base de datos.
+ */
 function insertar_codigo_de_activacion($id, $codigo)
 {
-    require   '../../assets/db/db.php';
+    require '../../assets/db/db.php';
     $sql = "INSERT INTO `codigo_de_activacion`( `id_user`, `hash`) VALUES ($id,'$codigo')";
     try {
         mysqli_query($conexion, $sql);
     } catch (Exception $e) {
-        Auto_report('Excepción capturada: ' .   $e->getMessage() . "\n en " . __FILE__ . ' en Linea ' . __LINE__);
+        Auto_report('Excepción capturada: ' . $e->getMessage() . "\n en " . __FILE__ . ' en Linea ' . __LINE__);
     }
 }
- function validar_codigo($codigo)
+/*
+ * Toma una cadena como argumento y devuelve una cadena.
+ *
+ * Args:
+ *   codigo: el código que ingresa el usuario
+ *
+ * Returns:
+ *   La cadena de consulta.
+ */
+function validar_codigo($codigo)
 {
-    include   (dirname(__FILE__).'/../../assets/db/db.php');    
-    $sql="SELECT * FROM `codigo_de_activaci2on` WHERE `hash`='$codigo'";
+    include(dirname(__FILE__) . '/../../assets/db/db.php');
+    $sql = "SELECT * FROM `codigo_de_activacion` WHERE `hash`='$codigo' and estado=0";
     try {
-        mysqli_query($conexion, $sql);
-
+        $retorno = mysqli_fetch_array(mysqli_query($conexion, $sql));
+        if (!is_null($retorno)) {
+            $id = $retorno['id_user'];
+            $sql = "UPDATE `usuario` SET `estado`=1 WHERE `id`=$id;";
+            $sql2 = "UPDATE `codigo_de_activacion` SET `estado`=1 WHERE `id_user`=$id";
+            try {
+                mysqli_query($conexion, $sql);
+                mysqli_query($conexion, $sql2);
+            } catch (Exception $e) {
+                Auto_report('Excepción capturada: ' . $e->getMessage() . "\n en " . __FILE__ . ' en Linea ' . __LINE__);
+            }
+        } else {
+            $retorno = '';
+        }
     } catch (Exception $e) {
-        Auto_report('Excepción capturada: ' .   $e->getMessage() . "\n en " . __FILE__ . ' en Linea ' . __LINE__);
+        Auto_report('Excepción capturada: ' . $e->getMessage() . "\n en " . __FILE__ . ' en Linea ' . __LINE__);
+        $retorno = '';
     }
-   return $sql;
+    return $retorno;
+}
+function validar_codigo_restablecimiento($hash)
+{
+    $retorno = '0';
+    include(dirname(__FILE__) . '/../../assets/db/db.php');
+    $sql = "SELECT * FROM `codigos_de_restablecimiento` WHERE `hash`='$hash' and `estado`=0;";
+    try {
+        $retorno = mysqli_fetch_array(mysqli_query($conexion, $sql));
+    } catch (Exception $e) {
+        Auto_report('Excepción capturada: ' . $e->getMessage() . "\n en " . __FILE__ . ' en Linea ' . __LINE__);
+    }
+    return ($retorno);
 }

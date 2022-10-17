@@ -68,7 +68,6 @@ if (mysqli_query($conexion, $sentence)) {
                                         }
                                         ?>
                                     </select>
-                                    
                                 </div>
                                 <div class="col-md-12 my-2">
                                     <button class="btn btn-smart-login text-white" type="submit">aceptar</button>

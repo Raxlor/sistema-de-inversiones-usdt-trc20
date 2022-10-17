@@ -1,4 +1,6 @@
 <?php
+    include '../vendor/autoload.php';
+
 ini_set('session.gc_maxtime', 6000 * 59 * 59);
 $lifetime = 6000 * 59 * 59;
 setcookie(session_name(), session_id(), time() + $lifetime);
@@ -9,7 +11,10 @@ include '../assets/db/db.php';
 $c = $_POST['nick'];
 
 $cc = $_POST['contraseña'];
-$cc = openssl_encrypt($cc, "AES-128-ECB", $key_encryp);
+$dotenv = new Dotenv\Dotenv('../.');
+    $dotenv->load();
+    $respuesta_ = array();
+$cc = openssl_encrypt($cc, "AES-128-ECB", getenv('key_cifrado'));
 $sentence = "SELECT count(*),id,estado FROM `usuario` WHERE `nick`='$c' AND `contraseña`='$cc'";
 $data_mysli = mysqli_fetch_array(mysqli_query($conexion, $sentence));
 
