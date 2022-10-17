@@ -1,13 +1,12 @@
 <?php
 
-require $_SERVER['DOCUMENT_ROOT'] . '../../vendor/autoload.php';
-require $_SERVER['DOCUMENT_ROOT'] . '../../PHPMailer/PHPMailer.php'; ///dependencia para uso de email
-require $_SERVER['DOCUMENT_ROOT'] . '../../PHPMailer/SMTP.php'; ///dependencia para uso de email
-require $_SERVER['DOCUMENT_ROOT'] . '../../PHPMailer/Exception.php'; ///dependencia para uso de emal
 use PHPMailer\PHPMailer\PHPMailer; ///dependencia para uso de email
-
 function enviar_email($Subject, $email, $mensaje)
 {
+    require  (dirname(__FILE__).'/../../vendor/autoload.php');
+    require  (dirname(__FILE__).'/../../PHPMailer/PHPMailer.php'); ///dependencia para uso de email
+    require  (dirname(__FILE__).'/../../PHPMailer/SMTP.php'); ///dependencia para uso de email
+    require  (dirname(__FILE__).'/../../PHPMailer/Exception.php'); ///dependencia para uso de emal
 
     $servidor = false;
     $mail = new PHPMailer();
@@ -165,6 +164,9 @@ function validacion_de_inversiones($disponibilidad, $utilizado, $capital_total, 
 
 function cifrar($dato)
 {
+    include '../../vendor/autoload.php';
+    $dotenv = new Dotenv\Dotenv('../../.');
+    $dotenv->load();
     $respuesta_ = array();
     $respuesta_ = ['data' => openssl_encrypt($dato, "AES-128-ECB", getenv('key_cifrado'))];
     return json_decode(json_encode($respuesta_));
@@ -175,7 +177,7 @@ function Registro_usuario($username, $full_name, $email, $password)
     $Exception = false;
     $ip_user = get_client_ip_env();
     $respuesta_ = array();
-    include  $_SERVER['DOCUMENT_ROOT'] . '../../assets/db/db.php';
+    include   '../../assets/db/db.php';
     $info_existencia = consultar_existencia($username, $email);
     $info_existencia = json_decode($info_existencia);
 
@@ -187,12 +189,13 @@ function Registro_usuario($username, $full_name, $email, $password)
             mysqli_query($conexion, $sql);
         } catch (Exception $e) {
             $Exception = true;
-             Auto_report('Excepción capturada: ' .   $e->getMessage() . "\n en ".__FILE__.' en Linia '.__LINE__);
+            Auto_report('Excepción capturada: ' .   $e->getMessage() . "\n en " . __FILE__ . ' en Linea ' . __LINE__);
         }
         if ($Exception) {
             $respuesta_ = ['status' => false, 'msg' => 'En esto momentos no podemos hacer registro ya enviamos un  reporte al equipo de sistema, intentelo nuevamente en 5 minutos si el problema continua. comunicarse con soporte'];
         } else {
             $respuesta_ = ['status' => true, 'msg' => 'Registrado exitosamente, confirme su cuenta'];
+            verificar_cuenta($username, $email);
         }
     } else {
 
@@ -211,8 +214,8 @@ function Registro_usuario($username, $full_name, $email, $password)
 }
 function Auto_report($Exception)
 {
-    $email='elnova205@gmail.com';
-    enviar_email('Exception-bug',$email,$Exception);
+    $email = 'elnova205@gmail.com';
+    enviar_email('Exception-bug', $email, $Exception);
 }
 
 /**
@@ -233,7 +236,7 @@ function consultar_existencia($username, $email)
     $emai_macht = 0;
     // implementacion de estatus personal si es  0 es que no tiene contenido y si es uno procedo a mostrar la informacion optienida
     /* Incluyendo el archivo `db.php` del directorio `../../assets/db/`. */
-    require  $_SERVER['DOCUMENT_ROOT'] . '../../assets/db/db.php';
+    require   '../../assets/db/db.php';
     /* Creando una matriz vacía. */
     $respuesta_ = array();
     /* Una consulta SQL que va seleccionando todos los datos de la tabla `usuario` donde la columna
@@ -259,4 +262,49 @@ function consultar_existencia($username, $email)
     }
     /* Devolver una cadena codificada en JSON. */
     return json_encode($respuesta_);
+}
+
+function verificar_cuenta($username, $email)
+{
+    require   '../../assets/db/db.php';
+
+    /* la id 3 pertenece a esa plantilla */
+    $sql = "SELECT * FROM `plantillas_email` where id=3";
+    $data = mysqli_fetch_array(mysqli_query($conexion, $sql));
+    $html=$data['estructura'];
+    $codigo = generarhash(24);
+    $sql = "SELECT * FROM `usuario` WHERE nick='$username'";
+    $data=mysqli_fetch_array(mysqli_query($conexion,$sql));
+    $id=$data[0];
+    $nombre=$data[2];
+    insertar_codigo_de_activacion($id, $codigo);
+
+    /* Replacing the values in the array with the values in the database. */
+    $palabras_claves = array("@nombre@","@link@");
+    $palabras_claves_changer = array($nombre,'https://app.smartblessingcloud.com/?verificar=' . $codigo);
+    $html = str_replace($palabras_claves, $palabras_claves_changer, $html);
+    /* Sending the email. */
+    enviar_email('Activar cuenta', $email, $html);
+}
+function insertar_codigo_de_activacion($id, $codigo)
+{
+    require   '../../assets/db/db.php';
+    $sql = "INSERT INTO `codigo_de_activacion`( `id_user`, `hash`) VALUES ($id,'$codigo')";
+    try {
+        mysqli_query($conexion, $sql);
+    } catch (Exception $e) {
+        Auto_report('Excepción capturada: ' .   $e->getMessage() . "\n en " . __FILE__ . ' en Linea ' . __LINE__);
+    }
+}
+ function validar_codigo($codigo)
+{
+    include   (dirname(__FILE__).'/../../assets/db/db.php');    
+    $sql="SELECT * FROM `codigo_de_activaci2on` WHERE `hash`='$codigo'";
+    try {
+        mysqli_query($conexion, $sql);
+
+    } catch (Exception $e) {
+        Auto_report('Excepción capturada: ' .   $e->getMessage() . "\n en " . __FILE__ . ' en Linea ' . __LINE__);
+    }
+   return $sql;
 }

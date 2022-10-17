@@ -36,13 +36,19 @@
                             <img src="https://app.smartblessingconsulting.com/app-assets/images/ico/logo-img.png" alt="">
                         </div>
                         <?php
-                        require_once('../vendor/autoload.php');
+
                         ?>
                         <section class="contact-form-inner login_form">
 
                             <?php
                             if (isset($_GET['Registro'])) {
                                 include './html/registro.html';
+                            } elseif (isset($_GET['verificar'])) {
+                                require_once ('./assets/php/funciones.php');
+                                
+                                 var_dump(
+                                 validar_codigo($_GET['verificar'])
+                                 );
                             } else {
                                 // indentifico si es un login normal o un intento de registro
                                 require_once 'html/form_login.html';
@@ -105,8 +111,8 @@
                 })
             }
             <?php if (isset($_GET['restablecer'])) {
-                        echo "resert_password()";
-                    }?>
+                echo "resert_password()";
+            } ?>
         </script>
         <!-- JavaScript -->
         <script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>

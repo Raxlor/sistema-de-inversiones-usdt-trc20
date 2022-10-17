@@ -250,7 +250,7 @@ $("#login_form").submit(function () {
             location.href = "/";
           }, 1000);
         } else {
-          alertify.error("No hay usuario con eso datos, intente nuevamente");
+          alertify.error(resp.msg);
         }
       },
       error: function (error) {
@@ -286,6 +286,9 @@ $(function () {
         if (res.status) {
           alertify.success(res.msg);
           $("#register_form").trigger("reset");
+          setTimeout(() => {
+            location.href='/';
+          }, 1000);
         } else {
           if (res.msg !== "Recuperar") {
             alertify.error(`El ` + res.msg + ` no se encuentra disponible`);

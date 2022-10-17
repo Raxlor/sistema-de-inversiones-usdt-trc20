@@ -6,7 +6,7 @@ require_once '../../assets/php/funciones.php';
 $username = strtolower($_POST['username']);
 $email = strtolower($_POST['email']);
 $full_name = strtolower($_POST['nombre_completo']);
-$password = strtolower($_POST['myPassword']);
+$password = $_POST['myPassword'];
 $respuesta=Registro_usuario($username, $full_name, $email, $password);
 // se que esto es muy tedioso
 $respuesta=json_encode($respuesta);
