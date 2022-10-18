@@ -26,7 +26,7 @@ if ($data_mysli[0] > 0) {
   if ($data_mysli[2]=='1') {
     $id = $_SESSION['id_acceso_cliente'] = $data_mysli[1];
     $id_browser = $_SESSION['id_browser'] = session_id();
-    $update = "UPDATE `usuario` SET `session_id`='$id_browser' , estado=1 WHERE `id`=$id";
+    $update = "UPDATE `usuario` SET `session_id`='$id_browser' WHERE `id`=$id";
     mysqli_query($conexion, $update);
     $code = ['access' => true];
   } else {

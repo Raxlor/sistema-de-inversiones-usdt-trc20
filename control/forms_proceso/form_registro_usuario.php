@@ -17,4 +17,4 @@ if ($respuesta->status) {
 }else {
     $code = ['status'=>$respuesta->status,'msg' => $respuesta->msg];
 }
-echo json_encode($code);
+echo json_encode($respuesta);

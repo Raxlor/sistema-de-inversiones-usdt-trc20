@@ -42,16 +42,13 @@
                             <img src="https://app.smartblessingconsulting.com/app-assets/images/ico/logo-img.png"
                                 alt="">
                         </div>
-                        <?php
-
-?>
                         <section class="contact-form-inner login_form">
 
                             <?php
 /* Una declaración condicional que comprueba si el usuario está intentando
  registrarse o iniciar sesión. */
 if (isset($_GET['Registro'])) {
-    include './html/registro.html';
+    include './html/registro.php';
 } elseif (isset($_GET['verificar'])) {
     require_once('./assets/php/funciones.php');
 ?>
@@ -62,9 +59,9 @@ if (isset($_GET['Registro'])) {
                                 <div></div>
                             </div>
                             <script>
-                                         etInterval(() => {
-                                            location.href='/';
-                    }, 900);
+                            etInterval(() => {
+                                location.href = '/';
+                            }, 900);
                             </script>
                             <?php
     validar_codigo($_GET['verificar']);
@@ -92,53 +89,56 @@ if (isset($_GET['Registro'])) {
         <script src="assets/js/main.js"></script>
         <script src="../assets/js/puglins/jquery.password-validation.js"></script>
         <script>
-            setTimeout(() => {
-                alertify.set('notifier', 'position', 'top-center');
-            }, 500);
+        setTimeout(() => {
+            alertify.set('notifier', 'position', 'top-center');
+        }, 500);
 
-            function resert_password() {
-                Swal.fire({
-                    title: 'Correo eletronico de la cuenta',
-                    input: 'email',
-                    inputAttributes: {
-                        autocapitalize: 'on'
-                    },
-                    showCancelButton: true,
-                    confirmButtonText: 'Enviar',
-                    showLoaderOnConfirm: true,
-                    preConfirm: (login) => {
-                        let formData = {
-                            email: login,
-                            valor: 1,
-                        };
-                        $.ajax({
-                            type: "POST",
-                            url: 'control/helpers/reset_password.php',
-                            data: formData,
-                            beforeSend: function () { },
-                            success: function (resp) {
+        function resert_password() {
+            Swal.fire({
+                title: 'Correo eletronico de la cuenta',
+                input: 'email',
+                inputAttributes: {
+                    autocapitalize: 'on'
+                },
+                showCancelButton: true,
+                confirmButtonText: 'Enviar',
+                showLoaderOnConfirm: true,
+                preConfirm: (login) => {
+                    let formData = {
+                        email: login,
+                        valor: 1,
+                    };
+                    $.ajax({
+                        type: "POST",
+                        url: 'control/helpers/reset_password.php',
+                        data: formData,
+                        beforeSend: function() {},
+                        success: function(resp) {
 
-                                if (resp.status) {
-                                    swal.fire("Enviado!", "Revise su correo electronico!", "success");
-                                } else {
-                                    swal.fire("No tiene cuenta!", "no tiene cuenta, con nosotro, puede registrate", "error");
-                                }
-                            },
-                            error: function (error) {
-                                alertify.error(error);
-                            },
-                        });
-                    },
-                    allowOutsideClick: () => !Swal.i sLoading()
-                 }).th en((result) => {
-                     if (resul t.isConfirmed) {
+                            if (resp.status) {
+                                swal.fire("Enviado!", "Revise su correo electronico!",
+                                    "success");
+                            } else {
+                                swal.fire("No tiene cuenta!",
+                                    "no tiene cuenta, con nosotro, puede registrate",
+                                    "error");
+                            }
+                        },
+                        error: function(error) {
+                            alertify.error(error);
+                        },
+                    });
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+            }).then((result) => {
+                if (result.isConfirmed) {
 
-            }
-         })
-            }
-            <?php if (isset($_GET['restablecer'])) {
-    echo "resert_password()";
-} ?>
+                }
+            })
+        }
+        <?php if (isset($_GET[' restablecer '])) {
+                echo " resert_password() ";
+            } ?>
         </script>
         <!-- JavaScript -->
         <script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
@@ -151,9 +151,9 @@ if (isset($_GET['Registro'])) {
             crossorigin="anonymous" referrerpolicy="no-referrer" />
         </script>
         <style>
-            .ajs-message {
-                border-radius: 10px !important;
-            }
+        .ajs-message {
+            border-radius: 10px !important;
+        }
         </style>
 </body>
 

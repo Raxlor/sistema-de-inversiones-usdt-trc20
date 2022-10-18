@@ -10,12 +10,16 @@ include 'assets/db/db.php';
 if (isset($_GET['deslog'])) {
     session_destroy();
     header('location: /');
-}
-elseif (isset($_SESSION['id_acceso_cliente'])) {
+} elseif (isset($_SESSION['id_acceso_cliente'])) {
 
 ?>
 <!DOCTYPE html>
 <html lang="es">
+<style>
+    body {
+        background: url(https://i.ibb.co/k0W4jcg/Background-2.jpg)
+    }
+</style>
 
 <head>
     <meta charset="UTF-8">
@@ -90,8 +94,7 @@ elseif (isset($_SESSION['id_acceso_cliente'])) {
 
 </html>
 <?php
-}
-else {
+} else {
     include_once 'vistas/login.php';
 }
 

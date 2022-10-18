@@ -156,7 +156,6 @@
         },
       },
     });
-
     /* -------------------------------------------------------------
           RoundCircle Progress js
         ------------------------------------------------------------- */
@@ -259,7 +258,28 @@ $("#login_form").submit(function () {
     });
   }
 });
+function link_referido() {
+  $(".btn").attr("disabled", true);
+  $.ajax({
+type: "POST",
+url: "../../vistas/asset/link_generar.php",
+success: function (resp) {
+  if (true) {
+    alertify.success("Link Creado");
+    setTimeout(() => {
+      perfil()
+      $(".btn").removeAttr("disabled");
 
+    }, 1000);
+  } else {
+    alertify.error(resp);
+  }
+},
+error: function (error) {
+  alertify.error("Pagina tiene un erro interno, verifica tu conexion");
+},
+});
+}
 $(function () {
   $("#register_form").on("submit", function (e) {
     $(".btn").attr("disabled", true);
@@ -287,7 +307,7 @@ $(function () {
           alertify.success(res.msg);
           $("#register_form").trigger("reset");
           setTimeout(() => {
-            location.href='/';
+            location.href = '/';
           }, 1000);
         } else {
           if (res.msg !== "Recuperar") {
@@ -304,9 +324,8 @@ $(function () {
             }).then((result) => {
               /* Read more about isConfirmed, isDenied below */
               if (result.isConfirmed) {
-                location.href='/?restablecer';
+                location.href = '/?restablecer';
               } else if (result.isDenied) {
-               
               }
             });
           }
@@ -321,3 +340,20 @@ $(function () {
       });
   });
 });
+/**
+ * Crea un elemento div temporal, copia el contenido del elemento que desea copiar, selecciona el
+ * contenido del elemento div temporal, copia el contenido del elemento div temporal y luego elimina el
+ * elemento div temporal.
+ */
+
+function ejecutar(idelemento){
+  var aux = document.createElement("div");
+  aux.setAttribute("contentEditable", true);
+  aux.innerHTML = idelemento
+  aux.setAttribute("onfocus", "document.execCommand('selectAll',false,null)");
+  document.body.appendChild(aux);
+  aux.focus();
+  document.execCommand("copy");
+  document.body.removeChild(aux);
+  alertify.success('Link de referido copiado.');
+}

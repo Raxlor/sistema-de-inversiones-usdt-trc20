@@ -55,7 +55,6 @@ function enviar_email($Subject, $email, $mensaje)
     $mail->Subject = $Subject; // envio el subject
     $mail->addAddress($email); // email de quien evia a la red
     $mail->msgHTML($mensaje);
-    # code...
     if (!$mail->send()) {
         $informacion = 'Mailer Error: ' . $mail->ErrorInfo;
     } else {
@@ -65,9 +64,10 @@ function enviar_email($Subject, $email, $mensaje)
 }
 ;
 
+
 /**
- * Si el usuario está detrás de un proxy, la dirección IP del usuario es la primera dirección IP en el
- * encabezado HTTP_X_FORWARDED_FOR. De lo contrario, la dirección IP del usuario es REMOTE_ADDR.
+ * Si el usuario está detrás de un proxy, la función devolverá la dirección IP del proxy; de lo
+ * contrario, devolverá la dirección IP del usuario.
  * 
  * Returns:
  *   La dirección IP del usuario.
@@ -138,10 +138,10 @@ function generarhash($n)
     return $result;
 }
 /**
- * It gets the last code generated for a user, and then disables all the other codes for that user.
+ * Deshabilita todos los códigos anteriores excepto el último.
  * 
  * Args:
- *   id: The id of the user
+ *   id: La identificación del usuario
  */
 function deshabilitar_codigos_anteriores($id)
 {
@@ -155,17 +155,22 @@ function deshabilitar_codigos_anteriores($id)
     $sql = "UPDATE `codigos_de_restablecimiento` SET `estado` = '1' WHERE `codigos_de_restablecimiento`.`id` != $id_last";
     mysqli_query($conexion, $sql);
 }
+
 /**
- * Toma 5 parámetros y devuelve un objeto JSON con 4 propiedades
+ * Comprueba si el depósito es válido.
  * 
  * Args:
- *   disponibilidad: La cantidad de dinero que se puede invertir en este plan.
+ *   disponibilidad: La cantidad de dinero que se puede invertir en el plan.
  *   utilizado: la cantidad de dinero que se ha invertido en el plan
- *   capital_total: La cantidad total de capital que se ha invertido en el plan.
+ *   capital_total: La cantidad total de dinero que se ha invertido en el plan.
  *   objetivo_capital: La cantidad total de dinero que se puede invertir en el plan.
  *   multiplo: La cantidad de dinero que el usuario puede invertir debe ser un múltiplo de este número.
  *   mindeposito: depósito mínimo
- *   deposito: la cantidad de dinero que el usuario quiere invertir
+ *   deposito: La cantidad de dinero que el usuario quiere invertir.
+ * 
+ * Returns:
+ *  
+ * {"limite":"Verdadero","limite_holder":"Verdadero","multiplo":"Verdadero","min_deposito":"Verdadero"}
  */
 function validacion_de_inversiones($disponibilidad, $utilizado, $capital_total, $objetivo_capital, $multiplo, $mindeposito, $deposito)
 {
@@ -269,7 +274,10 @@ function Registro_usuario($username, $full_name, $email, $password)
         if ($Exception) {
             $respuesta_ = ['status' => false, 'msg' => 'En esto momentos no podemos hacer registro ya enviamos un  reporte al equipo de sistema, intentelo nuevamente en 5 minutos si el problema continua. comunicarse con soporte'];
         } else {
-            $respuesta_ = ['status' => true, 'msg' => 'Registrado exitosamente, confirme su cuenta'];
+
+            $info_existencia_sub=consultar_existencia($username, $email);
+            $info_existencia_sub = json_decode($info_existencia_sub);
+            $respuesta_ = ['status' => true, 'msg' => 'Registrado exitosamente, confirme su cuenta','id_return'=>$info_existencia_sub->id];
             verificar_cuenta($username, $email);
         }
     } else {
@@ -326,7 +334,7 @@ function consultar_existencia($username, $email)
     $sql = "SELECT * FROM `usuario` WHERE `nick`='$username' or `email`='$email'";
     /* Obtener la primera fila del resultado de la consulta. */
 
-    $data_sql = mysqli_fetch_row(mysqli_query($conexion, $sql));
+    $data_sql = mysqli_fetch_array(mysqli_query($conexion, $sql));
 
     /* Comprobando si la consulta devolvió algún dato. Si lo hiciera, devolverá los datos en la clave
      `sql_data`. Si no fuera así, devolverá `0` en la clave `status`. */
@@ -337,7 +345,7 @@ function consultar_existencia($username, $email)
         if ($email === $data_sql[3]) {
             $emai_macht = 1;
         }
-        $respuesta_ = ['status' => '1', 'sql_data' => $data_sql, 'macth_email' => $emai_macht, 'macth_nick' => $username_macht];
+        $respuesta_ = ['status' => '1','id'=>$data_sql['id'], 'sql_data' => $data_sql, 'macth_email' => $emai_macht, 'macth_nick' => $username_macht];
     } else {
         $respuesta_ = ['status' => '0', 'macth_email' => $emai_macht, 'macth_nick' => $username_macht];
     }
@@ -426,6 +434,15 @@ function validar_codigo($codigo)
     }
     return $retorno;
 }
+/**
+ * Comprueba si el hash existe en la base de datos y si su estado es 0 (no utilizado).
+ * 
+ * Args:
+ *   hash: El hash que se envió al correo electrónico del usuario.
+ * 
+ * Returns:
+ *   una matriz.
+ */
 function validar_codigo_restablecimiento($hash)
 {
     $retorno = '0';
@@ -437,4 +454,34 @@ function validar_codigo_restablecimiento($hash)
         Auto_report('Excepción capturada: ' . $e->getMessage() . "\n en " . __FILE__ . ' en Linea ' . __LINE__);
     }
     return ($retorno);
+}
+
+
+/**
+ * Genera un hash aleatorio y lo inserta en una tabla de base de datos.
+ * 
+ * Args:
+ *   id_user: La identificación del usuario
+ *   intentos: Número de intentos
+ */
+function generar_link_referencia($id_user,$intentos)
+{
+    $intentos=$intentos+1;
+    include(dirname(__FILE__) . '/../../assets/db/db.php');
+    $hash=generarhash(7);
+    $sql="INSERT INTO `link_referido`( `enlace_primario`, `hash_para_enlance`) VALUES ($id_user,'$hash')";
+   /* Intentando insertar un registro en una base de datos. */
+    try {
+      mysqli_query($conexion,$sql);
+    } catch (\Exception $e) {
+        /* Comprobando si la variable  es menor o igual a 3. Si lo es, llamará a la función
+        generar_link_referencia() y le pasará las variables  y . Si no es así,
+        llamará a la función Auto_report() y le pasará el mensaje de error. */
+        if ($intentos<=3) {
+           generar_link_referencia($id_user,$intentos);
+        }else {
+            Auto_report('Excepción capturada: ' . $e->getMessage() . "\n en " . __FILE__ . ' en Linea ' . __LINE__);
+        }
+    }
+    return $hash;
 }
