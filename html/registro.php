@@ -53,8 +53,10 @@
                          if(!valid) $(element).css("border","1px solid red");
                          if(valid && match)
                             {
+
                                 $("#myConfirmPassword").css("border","1px solid green");
                                 $('#registrar').removeAttr('disabled');
+
                             }
                          if(!valid || !match){
                              $("#myConfirmPassword").css("border","1px solid #ff000024");
