@@ -225,11 +225,12 @@ function validacion_de_inversiones($disponibilidad, $utilizado, $capital_total, 
  * {"datos":"\u0016\u0016\u0016\u0016\u0016\u0016\u0016\u0016\u0016\u0016\u0016\u0016\u0016\u0016\u0016\u0016\u0016\u0016\u
  */
 function cifrar($dato)
-{        include '../../vendor/autoload.php';
+{
+    include '../../vendor/autoload.php';
     $dotenv = new Dotenv\Dotenv('../../.');
     $dotenv->load();
     $respuesta_ = array();
-  
+
     $respuesta_ = ['data' => openssl_encrypt($dato, "AES-128-ECB", getenv('key_cifrado'))];
 
     return json_decode(json_encode($respuesta_));
@@ -275,9 +276,9 @@ function Registro_usuario($username, $full_name, $email, $password)
             $respuesta_ = ['status' => false, 'msg' => 'En esto momentos no podemos hacer registro ya enviamos un  reporte al equipo de sistema, intentelo nuevamente en 5 minutos si el problema continua. comunicarse con soporte'];
         } else {
 
-            $info_existencia_sub=consultar_existencia($username, $email);
+            $info_existencia_sub = consultar_existencia($username, $email);
             $info_existencia_sub = json_decode($info_existencia_sub);
-            $respuesta_ = ['status' => true, 'msg' => 'Registrado exitosamente, confirme su cuenta','id_return'=>$info_existencia_sub->id];
+            $respuesta_ = ['status' => true, 'msg' => 'Registrado exitosamente, confirme su cuenta', 'id_return' => $info_existencia_sub->id];
             verificar_cuenta($username, $email);
         }
     } else {
@@ -345,7 +346,7 @@ function consultar_existencia($username, $email)
         if ($email === $data_sql[3]) {
             $emai_macht = 1;
         }
-        $respuesta_ = ['status' => '1','id'=>$data_sql['id'], 'sql_data' => $data_sql, 'macth_email' => $emai_macht, 'macth_nick' => $username_macht];
+        $respuesta_ = ['status' => '1', 'id' => $data_sql['id'], 'sql_data' => $data_sql, 'macth_email' => $emai_macht, 'macth_nick' => $username_macht];
     } else {
         $respuesta_ = ['status' => '0', 'macth_email' => $emai_macht, 'macth_nick' => $username_macht];
     }
@@ -464,24 +465,73 @@ function validar_codigo_restablecimiento($hash)
  *   id_user: La identificación del usuario
  *   intentos: Número de intentos
  */
-function generar_link_referencia($id_user,$intentos)
+function generar_link_referencia($id_user, $intentos)
 {
-    $intentos=$intentos+1;
+    $intentos = $intentos + 1;
     include(dirname(__FILE__) . '/../../assets/db/db.php');
-    $hash=generarhash(7);
-    $sql="INSERT INTO `link_referido`( `enlace_primario`, `hash_para_enlance`) VALUES ($id_user,'$hash')";
-   /* Intentando insertar un registro en una base de datos. */
+    $hash = generarhash(7);
+    $sql = "INSERT INTO `link_referido`( `enlace_primario`, `hash_para_enlance`) VALUES ($id_user,'$hash')";
+    /* Intentando insertar un registro en una base de datos. */
     try {
-      mysqli_query($conexion,$sql);
+        mysqli_query($conexion, $sql);
     } catch (\Exception $e) {
         /* Comprobando si la variable  es menor o igual a 3. Si lo es, llamará a la función
-        generar_link_referencia() y le pasará las variables  y . Si no es así,
-        llamará a la función Auto_report() y le pasará el mensaje de error. */
-        if ($intentos<=3) {
-           generar_link_referencia($id_user,$intentos);
-        }else {
+         generar_link_referencia() y le pasará las variables  y . Si no es así,
+         llamará a la función Auto_report() y le pasará el mensaje de error. */
+        if ($intentos <= 3) {
+            generar_link_referencia($id_user, $intentos);
+        } else {
+            /* Detectar la excepción y enviar un correo electrónico al desarrollador. */
             Auto_report('Excepción capturada: ' . $e->getMessage() . "\n en " . __FILE__ . ' en Linea ' . __LINE__);
         }
     }
     return $hash;
+}
+
+/**
+ * Toma una ID de usuario y un hash, y si el hash existe en la base de datos, inserta la ID de usuario
+ * y el hash en otra tabla
+ * 
+ * Args:
+ *   id_user: La identificación del usuario
+ *   hash: El hash del enlace en el que el usuario hizo clic.
+ * 
+ * Returns:
+ *   una matriz con una clave de estado y un valor de verdadero o falso.
+ */
+
+function certificar_link_referencia($id_user, $hash)
+{
+    $respuesta_ = array();
+    include(dirname(__FILE__) . '/../../assets/db/db.php');
+    $sql = "SELECT * FROM `link_referido` WHERE `hash_para_enlance`='$hash'";
+    $data_sql = mysqli_fetch_array(mysqli_query($conexion, $sql));
+    /* Comprobando si data_sql no es nulo. */
+    if (!is_null($data_sql)) {
+        /* Intentando conectarse a la base de datos. */
+
+            $sql = "INSERT INTO `auxiliar_enlace`(`id_user`, `hash_para_enlance`) VALUES ($id_user,'$hash')";
+            mysqli_query($conexion, $sql);
+            $respuesta_ = ['status' => true];
+      
+        // mas tarde talves pongamos un sistema de mensaje, osea ya esta
+    } else {
+        $respuesta_ = ['status' => false];
+    }
+    return $respuesta_;
+}
+/**
+ * Cuenta el número de referencias de cada cliente y actualiza la base de datos.
+ */
+/* Contar el número de referidos del cliente. */
+/* Contar el número de referidos del cliente. */
+function Contar_referidos_del_cliente()
+{
+    include(dirname(__FILE__) . '/../../assets/db/db.php');
+    $sql="SELECT hash_para_enlance,COUNT(*) as usuarios FROM auxiliar_enlace WHERE 1 GROUP by auxiliar_enlace.hash_para_enlance";
+    $query=mysqli_query($conexion,$sql);
+    while ($sql_data=mysqli_fetch_array($query)) {
+        $sql_update="UPDATE `link_referido` SET `cantidad_referidos`=$sql_data[1] WHERE `hash_para_enlance`='$sql_data[0]'";
+        mysqli_query($conexion,$sql_update);
+    }
 }

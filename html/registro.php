@@ -39,7 +39,7 @@
                 </div>
                 <div class="col-12">
                     <label class="single-input-wrap">
-                        <input readonly type="text" name="1" value="<?php echo (isset($_GET['ref']))?  $_GET['ref'] : '' ; ?>" id="codigo" required maxlength="40"
+                        <input readonly type="text" name="hash" value="<?php echo (isset($_GET['ref']))?  $_GET['ref'] : '' ; ?>" id="codigo" required maxlength="40"
                             placeholder="Patrocinador">
                     </label>
                 </div>

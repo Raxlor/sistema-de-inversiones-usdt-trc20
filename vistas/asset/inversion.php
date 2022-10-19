@@ -102,9 +102,9 @@ if (mysqli_query($conexion, $sentence)) {
                             </table>
                         </section>
                         <script>
-                            $(document).ready(function() {
+                            setTimeout(() => {
                                 actualizar_contrato_tabla()
-                            });
+                            }, 1);
                         </script>
                     </div>
                 </div>
@@ -112,4 +112,3 @@ if (mysqli_query($conexion, $sentence)) {
         </div>
     </div>
 </main>
-<?php include '../../vistas/asset/footer.php';  ?>

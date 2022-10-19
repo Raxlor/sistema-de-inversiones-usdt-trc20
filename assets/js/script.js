@@ -211,7 +211,7 @@ function actualizar_contrato_tabla() {
         },
       ],
     });
-  }, 1500);
+  }, 1000);
 }
 setInterval(() => {
   $.ajax({

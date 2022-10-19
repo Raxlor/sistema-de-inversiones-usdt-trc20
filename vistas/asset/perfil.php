@@ -6,16 +6,17 @@ try {
     $id = $_SESSION['id_acceso_cliente'];
     $select = "SELECT usuario.*,COUNT(contractos.id_user) as cuenta,SUM(contractos.cantidad) as invertido,SUM(contractos.recibido) as recibido FROM `usuario` INNER join contractos on usuario.id=contractos.id_user where usuario.id=$id and contractos.estado=1 GROUP by contractos.id_user";
     $data = mysqli_fetch_array(mysqli_query($conexion, $select));
-    $es_falso = is_null($data['cuenta']);
-    if ($es_falso == false) {
-        $porcent = number_format(($data['recibido'] * 100) / $data['invertido'], 2, ',');
-    } else {
-        $select = "SELECT usuario.*,SUM(0) as cuenta,SUM(0) as invertido,SUM(0) as recibido FROM `usuario` where usuario.id=$id";
-        $data = mysqli_fetch_array(mysqli_query($conexion, $select));
+    $es_falso =false;
+   
+        if ($es_falso == false) {
+            $porcent = number_format(($data['recibido'] * 100) / $data['invertido'], 2, ',');
+        } else {
+            $select = "SELECT usuario.*,SUM(0) as cuenta,SUM(0) as invertido,SUM(0) as recibido FROM `usuario` where usuario.id=$id";
+            $data = mysqli_fetch_array(mysqli_query($conexion, $select));
+        }
+    } catch (Exception $e) {
+        echo 'Excepción capturada: ',  $e->getMessage(), "\n";
     }
-} catch (Exception $e) {
-    echo 'Excepción capturada: ',  $e->getMessage(), "\n";
-}
 ?>
 <main class="custom-height">
     <div class="container">
@@ -151,9 +152,11 @@ try {
                                } else {
                                 require_once '../../assets/php/funciones.php';
                                 ?>
-                                <code>
-                                para ser Patrocinador nesecita tener inversion, con nosotro
-                              </code>
+                              <div class="col-md-12">  
+                                    <code>
+                                    para ser Patrocinador nesecita tener inversion, con nosotro
+                                </code>
+                                </div>
                                <?php
                                  }
                               ?>

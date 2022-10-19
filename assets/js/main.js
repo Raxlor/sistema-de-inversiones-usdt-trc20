@@ -307,7 +307,7 @@ $(function () {
           alertify.success(res.msg);
           $("#register_form").trigger("reset");
           setTimeout(() => {
-            location.href = '/';
+            //location.href = '/';
           }, 1000);
         } else {
           if (res.msg !== "Recuperar") {
