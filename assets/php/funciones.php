@@ -1,4 +1,25 @@
 <?php
+/*
+ ███████████████████████████
+ ███████▀▀▀░░░░░░░▀▀▀███████
+ ████▀░░░░░░░░░░░░░░░░░▀████
+ ███│░░░░░░░░░░░░░░░░░░░│███
+ ██▌│░░░░░░░░░░░░░░░░░░░│▐██
+ ██░└┐░░░░░░░░░░░░░░░░░┌┘░██
+ ██░░└┐░░░░░░░░░░░░░░░┌┘░░██
+ ██░░┌┘▄▄▄▄▄░░░░░▄▄▄▄▄└┐░░██
+ ██▌░│██████▌░░░▐██████│░▐██
+ ███░│▐███▀▀░░▄░░▀▀███▌│░███             THE FUNCTION 0.2
+ ██▀─┘░░░░░░░▐█▌░░░░░░░└─▀██
+ ██▄░░░▄▄▄▓░░▀█▀░░▓▄▄▄░░░▄██
+ ████▄─┘██▌░░░░░░░▐██└─▄████
+ █████░░▐█─┬┬┬┬┬┬┬─█▌░░█████
+ ████▌░░░▀┬┼┼┼┼┼┼┼┬▀░░░▐████
+ █████▄░░░└┴┴┴┴┴┴┴┘░░░▄█████
+ ███████▄░░░░░░░░░░░▄███████
+ ██████████▄▄▄▄▄▄▄██████████
+ ███████████████████████████
+ */
 
 /* Importación de la biblioteca PHPMailer. */
 use PHPMailer\PHPMailer\PHPMailer;
@@ -64,7 +85,6 @@ function enviar_email($Subject, $email, $mensaje)
 }
 ;
 
-
 /**
  * Si el usuario está detrás de un proxy, la función devolverá la dirección IP del proxy; de lo
  * contrario, devolverá la dirección IP del usuario.
@@ -117,7 +137,6 @@ function generateNumericOTP($n)
     for ($i = 1; $i <= $n; $i++) {
         $result .= substr($generator, (rand() % (strlen($generator))), 1);
     }
-
     // Return result
     return $result;
 }
@@ -213,7 +232,6 @@ function validacion_de_inversiones($disponibilidad, $utilizado, $capital_total, 
     return json_encode($respuesta_);
 }
 
-
 /**
  * Cifra los datos utilizando el algoritmo AES-128-ECB.
  * 
@@ -252,7 +270,6 @@ function cifrar($dato)
  *     [msg] => Registrado exitosamente, confirme su cuenta
  * )
  */
-
 function Registro_usuario($username, $full_name, $email, $password)
 {
     $Exception = false;
@@ -307,7 +324,6 @@ function Auto_report($Exception)
     $email = 'elnova205@gmail.com';
     enviar_email('Exception-bug', $email, $Exception);
 }
-
 /**
  * Devuelve una matriz codificada en JSON con una clave de estado y una clave sql_data. La clave de
  * estado es 0 o 1. La clave sql_data es una matriz de los resultados de la consulta.
@@ -362,6 +378,7 @@ function consultar_existencia($username, $email)
  *   username: El nombre de usuario del usuario.
  *   email: La dirección de correo electrónico del usuario.
  */
+
 function verificar_cuenta($username, $email)
 {
     require '../../assets/db/db.php';
@@ -401,6 +418,7 @@ function insertar_codigo_de_activacion($id, $codigo)
         Auto_report('Excepción capturada: ' . $e->getMessage() . "\n en " . __FILE__ . ' en Linea ' . __LINE__);
     }
 }
+
 /*
  * Toma una cadena como argumento y devuelve una cadena.
  *
@@ -423,17 +441,19 @@ function validar_codigo($codigo)
             try {
                 mysqli_query($conexion, $sql);
                 mysqli_query($conexion, $sql2);
+                $retorno = 'Validación completada';
+
             } catch (Exception $e) {
                 Auto_report('Excepción capturada: ' . $e->getMessage() . "\n en " . __FILE__ . ' en Linea ' . __LINE__);
             }
         } else {
-            $retorno = '';
+            $retorno = 'Enlace invalido';
         }
     } catch (Exception $e) {
         Auto_report('Excepción capturada: ' . $e->getMessage() . "\n en " . __FILE__ . ' en Linea ' . __LINE__);
-        $retorno = '';
+        $retorno = 'Enlace invalido';
     }
-    return $retorno;
+    header("refresh:0.5;url=/");
 }
 /**
  * Comprueba si el hash existe en la base de datos y si su estado es 0 (no utilizado).
@@ -454,13 +474,71 @@ function validar_codigo_restablecimiento($hash)
     } catch (Exception $e) {
         Auto_report('Excepción capturada: ' . $e->getMessage() . "\n en " . __FILE__ . ' en Linea ' . __LINE__);
     }
-    return ($retorno);
+    return (json_encode($retorno));
 }
+/**
+ * Comprueba si el código es válido y si lo es, actualiza la contraseña.
+ * 
+ * Args:
+ *   hash: El hash que se envió al correo electrónico del usuario.
+ *   codigo: El código que se envió al correo electrónico del usuario.
+ *   new_password: La nueva contraseña que el usuario quiere cambiar.
+ * 
+ * Returns:
+ *   un objeto JSON con la siguiente estructura:
+ * {
+ *     "estado": cierto,
+ *     "msg": "Contraseña cambiada."
+ * }
+ */
 
+function restablecer_contraseña($hash, $codigo, $new_password)
+{
+    $repuesta = array();
+    /* Incluyendo el archivo de la base de datos. */
+    include(dirname(__FILE__) . '/../../assets/db/db.php');
+    /* Cifrado de la contraseña. */
+    /* Validando el código que se envió al correo electrónico del usuario. */
+    $informacion = validar_codigo_restablecimiento($hash);
+    /* Comprobando si el código es el mismo que el código en la base de datos. */
+    $informacion = json_decode($informacion);
+    if (is_null($informacion)) {
+        $intentos = 4;
+    } else {
+        $intentos = $informacion->intento;
+    }
+    /* Comprobando si el código es válido y si lo es, actualizará la contraseña. */
+    if ($intentos <= 3) {
+        if ($informacion->code == $codigo) {
+            $new_password = cifrar($new_password);
+            $id_user = $informacion->id_user;
+            $repuesta = ['status' => true, 'msg' => 'Contraseña cambiada.'];
+            $update = "UPDATE `usuario` SET `contraseña`='$new_password' WHERE `id`='$id_user'";
+            try {
+                mysqli_query($conexion, $update);
+            } catch (\Exception $e) {
+                /* Detectar la excepción y enviar un correo electrónico al administrador. */
+                Auto_report('Excepción capturada: ' . $e->getMessage() . "\n en " . __FILE__ . ' en Linea ' . __LINE__);
+            }
+        } else {
+            /* Actualización de la base de datos con el nuevo valor de la variable . */
+            $intentos = $intentos + 1;
+            $sql = "UPDATE `codigos_de_restablecimiento` SET `intento`=$intentos WHERE `hash`='$hash'";
+            $repuesta = ['status' => false, 'msg' => 'El código no, es válido.'];
+            mysqli_query($conexion, $sql);
+        }
+    } else {
+        $sql = "UPDATE `codigos_de_restablecimiento` SET `estado`=1 WHERE `hash`='$hash'";
+        mysqli_query($conexion, $sql);
+        $repuesta = ['status' => false, 'msg' => 'Alcanzaste tu límite de intentos.'];
+    }
+    /* Devolviendo el valor de la variable  en formato JSON. */
+    return json_encode($repuesta);
+}
 
 /**
  * Genera un hash aleatorio y lo inserta en una tabla de base de datos.
- * 
+ *
  * Args:
  *   id_user: La identificación del usuario
  *   intentos: Número de intentos
@@ -487,7 +565,6 @@ function generar_link_referencia($id_user, $intentos)
     }
     return $hash;
 }
-
 /**
  * Toma una ID de usuario y un hash, y si el hash existe en la base de datos, inserta la ID de usuario
  * y el hash en otra tabla
@@ -510,28 +587,36 @@ function certificar_link_referencia($id_user, $hash)
     if (!is_null($data_sql)) {
         /* Intentando conectarse a la base de datos. */
 
-            $sql = "INSERT INTO `auxiliar_enlace`(`id_user`, `hash_para_enlance`) VALUES ($id_user,'$hash')";
-            mysqli_query($conexion, $sql);
-            $respuesta_ = ['status' => true];
-      
+        $sql = "INSERT INTO `auxiliar_enlace`(`id_user`, `hash_para_enlance`) VALUES ($id_user,'$hash')";
+        mysqli_query($conexion, $sql);
+        $respuesta_ = ['status' => true];
         // mas tarde talves pongamos un sistema de mensaje, osea ya esta
     } else {
         $respuesta_ = ['status' => false];
+
     }
     return $respuesta_;
 }
 /**
  * Cuenta el número de referencias de cada cliente y actualiza la base de datos.
  */
-/* Contar el número de referidos del cliente. */
-/* Contar el número de referidos del cliente. */
+
 function Contar_referidos_del_cliente()
 {
     include(dirname(__FILE__) . '/../../assets/db/db.php');
-    $sql="SELECT hash_para_enlance,COUNT(*) as usuarios FROM auxiliar_enlace WHERE 1 GROUP by auxiliar_enlace.hash_para_enlance";
-    $query=mysqli_query($conexion,$sql);
-    while ($sql_data=mysqli_fetch_array($query)) {
-        $sql_update="UPDATE `link_referido` SET `cantidad_referidos`=$sql_data[1] WHERE `hash_para_enlance`='$sql_data[0]'";
-        mysqli_query($conexion,$sql_update);
+    $sql = "SELECT hash_para_enlance,COUNT(*) as usuarios FROM auxiliar_enlace WHERE 1 GROUP by auxiliar_enlace.hash_para_enlance";
+    $query = mysqli_query($conexion, $sql);
+    while ($sql_data = mysqli_fetch_array($query)) {
+        $sql_update = "UPDATE `link_referido` SET `cantidad_referidos`=$sql_data[1] WHERE `hash_para_enlance`='$sql_data[0]'";
+        mysqli_query($conexion, $sql_update);
     }
+}
+function bonificacion()
+{
+    include(dirname(__FILE__) . '/../../assets/db/db.php');
+    // reglas de bonificacion
+    // 1: el valor a entregar no puede ser superior al monto invertido por el cliente
+    // 2: esta contara de un 10% de comison para primeras inversiones 5% de bonificacion para segundas inversiones y un 2.5% para demas
+
+
 }

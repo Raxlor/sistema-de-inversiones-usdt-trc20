@@ -10,6 +10,10 @@ include 'assets/db/db.php';
 if (isset($_GET['deslog'])) {
     session_destroy();
     header('location: /');
+} elseif (isset($_GET['ref'])) {
+    session_destroy();
+    include_once 'vistas/login.php';
+
 } elseif (isset($_SESSION['id_acceso_cliente'])) {
 
 ?>

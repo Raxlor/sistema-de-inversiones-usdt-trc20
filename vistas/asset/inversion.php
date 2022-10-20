@@ -104,7 +104,7 @@ if (mysqli_query($conexion, $sentence)) {
                         <script>
                             setTimeout(() => {
                                 actualizar_contrato_tabla()
-                            }, 1);
+                            }, 500);
                         </script>
                     </div>
                 </div>

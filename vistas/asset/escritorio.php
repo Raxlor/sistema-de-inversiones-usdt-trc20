@@ -41,7 +41,6 @@ include '../../vistas/asset/header.html';
     <!-- add balance start -->
     <div class="container">
         <div class="row">
-
             <div class="col-md-6 col-sm-12">
                 <div class="add-balance-area pd-top-40">
                     <div class="ba-add-balance-inner   bg-white">

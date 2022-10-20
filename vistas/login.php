@@ -58,18 +58,20 @@ if (isset($_GET['Registro'])) {
                                 <div></div>
                                 <div></div>
                             </div>
-                            <script>
-                            etInterval(() => {
-                                location.href = '/';
-                            }, 900);
-                            </script>
+                            <div class="row text-center ">
+                                <div class="col-md-12">
+                                    <h4 class="text-muted">Validando cuenta...</h4>
+                                </div>
+                            </div>
                             <?php
     validar_codigo($_GET['verificar']);
+
 } elseif (isset($_GET['hash'])) {
     require_once('./assets/php/funciones.php');
     if (validar_codigo_restablecimiento($_GET['hash']) === null) {
         header('location:/');
     } else {
+        $_SESSION['Validacion_hash']=$_GET['hash'];
         include(dirname(__FILE__) . '/../html/reset.html');
     }
 } else {
@@ -89,10 +91,11 @@ if (isset($_GET['Registro'])) {
         <script src="assets/js/main.js"></script>
         <script src="../assets/js/puglins/jquery.password-validation.js"></script>
         <script>
-        setTimeout(() => {
-            alertify.set('notifier', 'position', 'top-center');
-        }, 500);
-
+            setTimeout(() => {
+                alertify.set('notifier', 'position', 'top-center');
+            }, 500);
+           /* Un operador ternario que verifica si el parámetro GET `msg` está establecido. Si es así,
+           ejecutará el código dentro de la función `setTimeout`. */
         function resert_password() {
             Swal.fire({
                 title: 'Correo eletronico de la cuenta',

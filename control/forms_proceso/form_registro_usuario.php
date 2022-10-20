@@ -19,7 +19,7 @@ $id=$respuesta->id_return;
 certificar_link_referencia con el id_return y el hash. */
 if (isset($_POST['hash'])) {
     /* Una función que se utiliza para certificar la referencia del enlace con el id_return y el hash. */
-    var_dump(certificar_link_referencia($id, $_POST['hash']));
+    certificar_link_referencia($id, $_POST['hash']);
 }
 
 /* Comprobando si el estado es verdadero o falso. */

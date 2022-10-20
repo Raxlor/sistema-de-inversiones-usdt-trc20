@@ -155,6 +155,7 @@ function actualizar_transaciones_tabla_orden() {
       responsive: responsive,
       ajax: {
         url: "../vistas/asset/transacciones.php",
+        type:"POST",
         dataSrc: "data",
       },
       columns: [
@@ -191,6 +192,7 @@ function actualizar_contrato_tabla() {
       responsive: responsive,
       ajax: {
         url: "../vistas/asset/contrato.php",
+        type:"POST",
         dataSrc: "data",
       },
       columns: [
@@ -289,8 +291,9 @@ setInterval(() => {
   });
 }, 4500);
 
+
 /**
- * It's a function that loads a page into a div.
+ * Es una función que carga una página en un div.
  */
 function inversion() {
   $.ajax({
