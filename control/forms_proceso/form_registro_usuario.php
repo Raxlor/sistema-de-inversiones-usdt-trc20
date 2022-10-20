@@ -17,9 +17,9 @@ $respuesta = json_decode($respuesta);
 $id=$respuesta->id_return;
 /* Está comprobando si el hash está configurado, si lo está, está llamando a la función
 certificar_link_referencia con el id_return y el hash. */
-if (isset($_POST['1'])) {
+if (isset($_POST['hash'])) {
     /* Una función que se utiliza para certificar la referencia del enlace con el id_return y el hash. */
-    var_dump(certificar_link_referencia($id, $_POST['1']));
+    var_dump(certificar_link_referencia($id, $_POST['hash']));
 }
 
 /* Comprobando si el estado es verdadero o falso. */
