@@ -22,6 +22,7 @@
  */
 
 /* Importación de la biblioteca PHPMailer. */
+
 use PHPMailer\PHPMailer\PHPMailer;
 
 /**
@@ -82,8 +83,7 @@ function enviar_email($Subject, $email, $mensaje)
         $informacion = 'Email enviado';
     }
     return $informacion;
-}
-;
+};
 
 /**
  * Si el usuario está detrás de un proxy, la función devolverá la dirección IP del proxy; de lo
@@ -96,12 +96,18 @@ function get_client_ip_env()
 {
     $ipaddress = '';
     if (getenv('HTTP_CLIENT_IP'))
-        $ipaddress = getenv('HTTP_CLIENT_IP'); else if (getenv('HTTP_X_FORWARDED_FOR'))
-        $ipaddress = getenv('HTTP_X_FORWARDED_FOR'); else if (getenv('HTTP_X_FORWARDED'))
-        $ipaddress = getenv('HTTP_X_FORWARDED'); else if (getenv('HTTP_FORWARDED_FOR'))
-        $ipaddress = getenv('HTTP_FORWARDED_FOR'); else if (getenv('HTTP_FORWARDED'))
-        $ipaddress = getenv('HTTP_FORWARDED'); else if (getenv('REMOTE_ADDR'))
-        $ipaddress = getenv('REMOTE_ADDR'); else
+        $ipaddress = getenv('HTTP_CLIENT_IP');
+    else if (getenv('HTTP_X_FORWARDED_FOR'))
+        $ipaddress = getenv('HTTP_X_FORWARDED_FOR');
+    else if (getenv('HTTP_X_FORWARDED'))
+        $ipaddress = getenv('HTTP_X_FORWARDED');
+    else if (getenv('HTTP_FORWARDED_FOR'))
+        $ipaddress = getenv('HTTP_FORWARDED_FOR');
+    else if (getenv('HTTP_FORWARDED'))
+        $ipaddress = getenv('HTTP_FORWARDED');
+    else if (getenv('REMOTE_ADDR'))
+        $ipaddress = getenv('REMOTE_ADDR');
+    else
         $ipaddress = 'UNKNOWN';
 
     return $ipaddress;
@@ -442,7 +448,6 @@ function validar_codigo($codigo)
                 mysqli_query($conexion, $sql);
                 mysqli_query($conexion, $sql2);
                 $retorno = 'Validación completada';
-
             } catch (Exception $e) {
                 Auto_report('Excepción capturada: ' . $e->getMessage() . "\n en " . __FILE__ . ' en Linea ' . __LINE__);
             }
@@ -491,51 +496,56 @@ function validar_codigo_restablecimiento($hash)
  *     "msg": "Contraseña cambiada."
  * }
  */
+try {
+    //code...
 
-function restablecer_contraseña($hash, $codigo, $new_password)
-{
-    $repuesta = array();
-    /* Incluyendo el archivo de la base de datos. */
-    include(dirname(__FILE__) . '/../../assets/db/db.php');
-    /* Cifrado de la contraseña. */
-    /* Validando el código que se envió al correo electrónico del usuario. */
-    $informacion = validar_codigo_restablecimiento($hash);
-    /* Comprobando si el código es el mismo que el código en la base de datos. */
-    $informacion = json_decode($informacion);
-    if (is_null($informacion)) {
-        $intentos = 4;
-    } else {
-        $intentos = $informacion->intento;
-    }
-    /* Comprobando si el código es válido y si lo es, actualizará la contraseña. */
-    if ($intentos <= 3) {
-        if ($informacion->code == $codigo) {
-            $new_password = cifrar($new_password);
-            $id_user = $informacion->id_user;
-            $repuesta = ['status' => true, 'msg' => 'Contraseña cambiada.'];
-            $update = "UPDATE `usuario` SET `contraseña`='$new_password' WHERE `id`='$id_user'";
-            try {
-                mysqli_query($conexion, $update);
-            } catch (\Exception $e) {
-                /* Detectar la excepción y enviar un correo electrónico al administrador. */
-                Auto_report('Excepción capturada: ' . $e->getMessage() . "\n en " . __FILE__ . ' en Linea ' . __LINE__);
+    function restablecer_contraseña($hash, $codigo, $new_password)
+    {
+        $repuesta = array();
+        /* Incluyendo el archivo de la base de datos. */
+        include(dirname(__FILE__) . '/../../assets/db/db.php');
+        /* Cifrado de la contraseña. */
+        /* Validando el código que se envió al correo electrónico del usuario. */
+        $informacion = validar_codigo_restablecimiento($hash);
+        /* Comprobando si el código es el mismo que el código en la base de datos. */
+        $informacion = json_decode($informacion);
+        if (is_null($informacion)) {
+            $intentos = 4;
+        } else {
+            $intentos = $informacion->intento;
+        }
+        /* Comprobando si el código es válido y si lo es, actualizará la contraseña. */
+        if ($intentos <= 3) {
+            if ($informacion->code === $codigo) {
+                $new_password = cifrar($new_password)->data;
+                $id_user = $informacion->id_user;
+                $repuesta = ['status' => true, 'msg' => 'Contraseña cambiada.'];
+                $update = "UPDATE `usuario` SET `contraseña`='$new_password' WHERE `id`='$id_user'";
+                try {
+                    mysqli_query($conexion, $update);
+                } catch (\Exception $e) {
+                    /* Detectar la excepción y enviar un correo electrónico al administrador. */
+                    $repuesta = ('Excepción capturada: ' . $e->getMessage() . "\n en " . __FILE__ . ' en Linea ' . __LINE__);
+                }
+            } else {
+                /* Actualización de la base de datos con el nuevo valor de la variable . */
+                $intentos = $intentos + 1;
+                $sql = "UPDATE `codigos_de_restablecimiento` SET `intento`=$intentos WHERE `hash`='$hash'";
+                $repuesta = ['status' => false, 'msg' => 'El código no, es válido.'];
+                mysqli_query($conexion, $sql);
             }
         } else {
-            /* Actualización de la base de datos con el nuevo valor de la variable . */
-            $intentos = $intentos + 1;
-            $sql = "UPDATE `codigos_de_restablecimiento` SET `intento`=$intentos WHERE `hash`='$hash'";
-            $repuesta = ['status' => false, 'msg' => 'El código no, es válido.'];
+            $sql = "UPDATE `codigos_de_restablecimiento` SET `estado`=1 WHERE `hash`='$hash'";
             mysqli_query($conexion, $sql);
+            $repuesta = ['status' => false, 'msg' => 'Alcanzaste tu límite de intentos.'];
         }
-    } else {
-        $sql = "UPDATE `codigos_de_restablecimiento` SET `estado`=1 WHERE `hash`='$hash'";
-        mysqli_query($conexion, $sql);
-        $repuesta = ['status' => false, 'msg' => 'Alcanzaste tu límite de intentos.'];
+        /* Devolviendo el valor de la variable  en formato JSON. */
+        return json_encode($repuesta);
     }
-    /* Devolviendo el valor de la variable  en formato JSON. */
-    return json_encode($repuesta);
+} catch (\Exception $e) {
+    print('Excepción capturada: ' . $e->getMessage() . "\n en " . __FILE__ . ' en Linea ' . __LINE__);
 }
-
+/** funiones para el uso de bonificacion esto es jodidamente largo */
 /**
  * Genera un hash aleatorio y lo inserta en una tabla de base de datos.
  *
@@ -593,30 +603,104 @@ function certificar_link_referencia($id_user, $hash)
         // mas tarde talves pongamos un sistema de mensaje, osea ya esta
     } else {
         $respuesta_ = ['status' => false];
-
     }
     return $respuesta_;
 }
 /**
  * Cuenta el número de referencias de cada cliente y actualiza la base de datos.
  */
+function certificar_auxiliar_enlace()
+{
+    include(dirname(__FILE__) . '/../../assets/db/db.php');
+    $sql = "SELECT `id_user` FROM `auxiliar_enlace` WHERE 1";
+    $query = mysqli_query($conexion, $sql);
+    while ($sql_data = mysqli_fetch_array($query)) {
+        $verficando = "SELECT COUNT(*),id_user FROM `contractos` WHERE `id_user`=$sql_data[0]";
+        $data_verificacion = mysqli_fetch_array(mysqli_query($conexion, $verficando));
+        if ($data_verificacion[0] > 0) {
+            $sql_update = "UPDATE `auxiliar_enlace` SET `invirtiendo`=1 WHERE id_user=$data_verificacion[1]";
+        } else {
+            $sql_update = "UPDATE `auxiliar_enlace` SET `invirtiendo`=0 WHERE id_user=$sql_data[0] ";
+        }
+        mysqli_query($conexion, $sql_update);
+    }
+}
+function verificar_nivel_personal()
+{
+    include(dirname(__FILE__) . '/../../assets/db/db.php');
+    $maximo_nivel = "SELECT MAX(`nivel`) FROM `condiciones_de_niveles` WHERE 1";
+    $maximo_nivel = mysqli_fetch_array(mysqli_query($conexion, $maximo_nivel));
+    $nivel_max = $maximo_nivel[0];
+    $sql = "SELECT * FROM `link_referido`";
+    $query = mysqli_query($conexion, $sql);
+    while ($data = mysqli_fetch_array($query)) {
+        $nivel_actual = $data['nivel_actual'];
+
+        if ($nivel_max !== $nivel_actual) {
+            $verificar = $nivel_actual + 1;
+        } else {
+            $verificar = $nivel_max;
+        }
+        $sql_condicones = "SELECT * FROM `condiciones_de_niveles` where nivel=$verificar";
+        $query_verificar = mysqli_query($conexion, $sql_condicones);
+        $condiciones = mysqli_fetch_array($query_verificar);
+        if ($condiciones['cantidad_usuario'] <= $data['cantidad_referidos'] && $condiciones['cantidad_dinero'] <= $data['dinero_activo']) {
+            $update = "UPDATE `link_referido` SET `nivel_actual`=$verificar WHERE `id`=$data[0]";
+        } else {
+            $update = "UPDATE `link_referido` SET `nivel_actual`=$verificar-1 WHERE `id`=$data[0]";
+        }
+        mysqli_query($conexion, $update);
+    }
+}
 
 function Contar_referidos_del_cliente()
 {
     include(dirname(__FILE__) . '/../../assets/db/db.php');
-    $sql = "SELECT hash_para_enlance,COUNT(*) as usuarios FROM auxiliar_enlace WHERE 1 GROUP by auxiliar_enlace.hash_para_enlance";
+    $sql = "SELECT hash_para_enlance,SUM(contractos.cantidad) as dinero FROM auxiliar_enlace INNER JOIN contractos on contractos.id_user = auxiliar_enlace.id_user WHERE 1 and contractos.estado=1 and invirtiendo=1 GROUP by auxiliar_enlace.hash_para_enlance";
     $query = mysqli_query($conexion, $sql);
     while ($sql_data = mysqli_fetch_array($query)) {
-        $sql_update = "UPDATE `link_referido` SET `cantidad_referidos`=$sql_data[1] WHERE `hash_para_enlance`='$sql_data[0]'";
+        $sql_update = "UPDATE `link_referido` SET  dinero_activo=$sql_data[1] WHERE `hash_para_enlance`='$sql_data[0]'";
+        mysqli_query($conexion, $sql_update);
+    }
+    $sql = "SELECT hash_para_enlance,count(*) FROM `auxiliar_enlace` WHERE 1 and invirtiendo=1 GROUP BY `hash_para_enlance`";
+    $query = mysqli_query($conexion, $sql);
+    while ($sql_data = mysqli_fetch_array($query)) {
+        $sql_update = "UPDATE `link_referido` SET  cantidad_referidos=$sql_data[1] WHERE `hash_para_enlance`='$sql_data[0]'";
         mysqli_query($conexion, $sql_update);
     }
 }
 function bonificacion()
 {
     include(dirname(__FILE__) . '/../../assets/db/db.php');
-    // reglas de bonificacion
-    // 1: el valor a entregar no puede ser superior al monto invertido por el cliente
-    // 2: esta contara de un 10% de comison para primeras inversiones 5% de bonificacion para segundas inversiones y un 2.5% para demas
-
-
+    /*
+     Reglas de bonificacion en la base de dato
+    */
+    $sql = "SELECT `hash_para_enlance`,contractos.* FROM `auxiliar_enlace` LEFT JOIN contractos on contractos.id_user = auxiliar_enlace.id_user WHERE `invirtiendo`=1 and rendimiento_entregado=0";
+    $query = mysqli_query($conexion, $sql);
+    while ($data = mysqli_fetch_array($query)) {
+        $sql_indentificador = "SELECT `nivel_actual`,enlace_primario FROM `link_referido` WHERE `hash_para_enlance`='$data[0]'";
+        $data_indentifcador = mysqli_fetch_array(mysqli_query($conexion, $sql_indentificador));
+        $nivel = $data_indentifcador[0];
+        $usuario_receptor = $data_indentifcador[1];
+        if ($nivel >= 2) {
+            asistente_nivel($nivel, $data[0]);
+            echo 1;
+        }
+        echo '<br>';
+        $num_contrato = ($data['num_contrato'] <= 3) ? $data['num_contrato'] : 3; //* aca no asegurarmos de fijar un limite si los deposito ya va por el numero 4 lo interpretaremos como el 3r caso ya que solo hay 3 coso y buscar otro mas grande generaria errores
+        var_dump(Pagar_referencia($usuario_receptor, $data['cantidad'], $num_contrato, $data['hash'], $nivel));
+    }
+}
+function asistente_nivel($nivel, $hash_para_enlance)
+{
+    # code...
+}
+function Pagar_referencia($usuario_receptor, $cantidad, $num_contrato, $hash, $nivel)
+{
+    include(dirname(__FILE__) . '/../../assets/db/db.php');
+    $config = "SELECT `deposito_1`,`deposito_2`,`deposito_3` FROM `niveles_referido_bono` WHERE `nivel`= $nivel;";
+    $config = mysqli_fetch_array(mysqli_query($conexion, $config));
+    $porciento = $config['deposito_' . $num_contrato];
+    $calculo = $cantidad * $porciento / 100;
+    return $calculo;
 }

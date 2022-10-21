@@ -1,17 +1,19 @@
 <?php
 session_start();
-include '../../assets/db/db.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    header('Content-Type: application/json');
+    include '../../assets/db/db.php';
     require_once '../../assets/php/funciones.php';
     $password = $_POST['myPassword'];
     $code=$_POST['code'];
     $hash=$_SESSION['Validacion_hash'];
-    $respuesta=restablecer_contraseña($hash,$code,$password);
-    
+    try {
+        $respuesta=restablecer_contraseña($hash,$code,$password);
+    } catch (\Exception $e) {
+        $respuesta='Excepción capturada: ' . $e->getMessage() . "\n en " . __FILE__ . ' en Linea ' . __LINE__;
+    }
+    header('Content-Type: application/json');
     /* Comprobando si el estado es verdadero o falso. */
-    echo $respuesta;
+    print $respuesta;
 };
-
 ?>
