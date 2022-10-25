@@ -26,33 +26,7 @@ $("#login_form").submit(function () {
     });
   }
 });
-$("#login_form").submit(function () {
-  // var response = grecaptcha.getResponse();
-  if (false) {
-    alertify.error("Captcha no verificado");
-  } else {
-    contraseña = $("#pass").val();
-    cedula = $("#cedula").val();
-    $.ajax({
-      type: "POST",
-      data: "nick=" + cedula + "&contraseña=" + contraseña,
-      url: "./control/login.php",
-      success: function (resp) {
-        if (resp.access === true) {
-          alertify.success("Contraseña Restablecida");
-          setTimeout(() => {
-            location.href = "/";
-          }, 1000);
-        } else {
-          alertify.error(resp.msg);
-        }
-      },
-      error: function (error) {
-        alertify.error("Pagina tiene un erro interno, verifica tu conexion");
-      },
-    });
-  }
-});
+
 $("#reset").submit(function () {
   // var response = grecaptcha.getResponse();
   if (false) {
@@ -162,6 +136,7 @@ $(function () {
       });
   });
 });
+
 /**
  * Crea un elemento div temporal, copia el contenido del elemento que desea copiar, selecciona el
  * contenido del elemento div temporal, copia el contenido del elemento div temporal y luego elimina el
