@@ -83,7 +83,8 @@ function enviar_email($Subject, $email, $mensaje)
         $informacion = 'Email enviado';
     }
     return $informacion;
-};
+}
+;
 
 /**
  * Si el usuario está detrás de un proxy, la función devolverá la dirección IP del proxy; de lo
@@ -609,6 +610,10 @@ function certificar_link_referencia($id_user, $hash)
 /**
  * Cuenta el número de referencias de cada cliente y actualiza la base de datos.
  */
+/**
+ * Si el usuario tiene un contrato, establezca el campo `invirtiendo` del usuario en 1, de lo
+ * contrario, configúrelo en 0.
+ */
 function certificar_auxiliar_enlace()
 {
     include(dirname(__FILE__) . '/../../assets/db/db.php');
@@ -625,6 +630,11 @@ function certificar_auxiliar_enlace()
         mysqli_query($conexion, $sql_update);
     }
 }
+/**
+ * Para cada fila de la tabla link_referido, verifique si el usuario ha cumplido con los requisitos
+ * para el siguiente nivel, y si es así, actualice la columna nivel_actual al siguiente nivel, de lo
+ * contrario, déjelo como está.
+ */
 function verificar_nivel_personal()
 {
     include(dirname(__FILE__) . '/../../assets/db/db.php');
@@ -653,6 +663,10 @@ function verificar_nivel_personal()
     }
 }
 
+/**
+ * Actualiza la base de datos con el número de referidos y la cantidad de dinero que ha invertido el
+ * referido.
+ */
 function Contar_referidos_del_cliente()
 {
     include(dirname(__FILE__) . '/../../assets/db/db.php');
@@ -662,6 +676,7 @@ function Contar_referidos_del_cliente()
         $sql_update = "UPDATE `link_referido` SET  dinero_activo=$sql_data[1] WHERE `hash_para_enlance`='$sql_data[0]'";
         mysqli_query($conexion, $sql_update);
     }
+    /* Contar el número de veces que aparece un hash_para_enlance en la tabla auxiliar_enlace. */
     $sql = "SELECT hash_para_enlance,count(*) FROM `auxiliar_enlace` WHERE 1 and invirtiendo=1 GROUP BY `hash_para_enlance`";
     $query = mysqli_query($conexion, $sql);
     while ($sql_data = mysqli_fetch_array($query)) {
@@ -669,12 +684,16 @@ function Contar_referidos_del_cliente()
         mysqli_query($conexion, $sql_update);
     }
 }
+/**
+ * Una función que es llamada cada minuto por un trabajo cron. Comprueba la base de datos de los
+ * usuarios que han realizado un depósito y aún no han recibido su bono.
+ */
 function bonificacion()
 {
     include(dirname(__FILE__) . '/../../assets/db/db.php');
     /*
      Reglas de bonificacion en la base de dato
-    */
+     */
     $sql = "SELECT `hash_para_enlance`,contractos.* FROM `auxiliar_enlace` LEFT JOIN contractos on contractos.id_user = auxiliar_enlace.id_user WHERE `invirtiendo`=1 and rendimiento_entregado=0";
     $query = mysqli_query($conexion, $sql);
     while ($data = mysqli_fetch_array($query)) {
@@ -683,24 +702,87 @@ function bonificacion()
         $nivel = $data_indentifcador[0];
         $usuario_receptor = $data_indentifcador[1];
         if ($nivel >= 2) {
-            asistente_nivel($nivel, $data[0]);
-            echo 1;
+            /* Llamar a la función Wizard_level() y pasar los parámetros ,  y
+             [0]. */
+            /* Llamando a la función Wizard_level, que se define en el archivo Wizard_level.php. */
+            Wizard_level($usuario_receptor, $nivel, $data['id_user']);
         }
-        echo '<br>';
         $num_contrato = ($data['num_contrato'] <= 3) ? $data['num_contrato'] : 3; //* aca no asegurarmos de fijar un limite si los deposito ya va por el numero 4 lo interpretaremos como el 3r caso ya que solo hay 3 coso y buscar otro mas grande generaria errores
-        var_dump(Pagar_referencia($usuario_receptor, $data['cantidad'], $num_contrato, $data['hash'], $nivel));
+        Pagar_referencia($usuario_receptor, $data['cantidad'], $num_contrato, $data['hash'], 1);
     }
+    $update = "UPDATE `contractos` SET `rendimiento_entregado`=1 WHERE 1";
+    mysqli_query($conexion, $update);
 }
-function asistente_nivel($nivel, $hash_para_enlance)
+
+function Wizard_level($usuario_receptor, $nivel, $id)
 {
-    # code...
+    include(dirname(__FILE__) . '/../../assets/db/db.php');
+    echo $sql = "SELECT * FROM `link_referido` where enlace_primario=$id";
+    $data = mysqli_fetch_array(mysqli_query($conexion, $sql));
+    if (!is_null($data)) {
+        # code...
+    }
+    $hash_para_enlance = $data['hash_para_enlance'];
+    $SQL = "SELECT `hash_para_enlance`,contractos.* FROM `auxiliar_enlace` LEFT JOIN contractos on contractos.id_user = auxiliar_enlace.id_user WHERE `invirtiendo`=1 and rendimiento_entregado_LVL2=0 and `hash_para_enlance` LIKE '$hash_para_enlance'";
+    $query = mysqli_query($conexion, $SQL);
+    while ($data = mysqli_fetch_array($query)) {
+        $num_contrato = ($data['num_contrato'] <= 3) ? $data['num_contrato'] : 3; //* aca no asegurarmos de fijar un limite si los deposito ya va por el numero 4 lo interpretaremos como el 3r caso ya que solo hay 3 coso y buscar otro mas grande generaria errores
+        Pagar_referencia($usuario_receptor, $data['cantidad'], $num_contrato, $data['hash'], $nivel);
+
+        $update = "UPDATE `contractos` SET `rendimiento_entregado_LVL2`=1 WHERE id=$data[1]";
+        mysqli_query($conexion, $update);
+    }
+
+    //Pagar_referencia($usuario_receptor, $data['cantidad'], $num_contrato, $hash_para_enlance, $nivel);
 }
+/**
+ * Inserta una fila en una tabla llamada "transacciones" con las siguientes columnas: id_usuario,
+ * cantidad, motivo, json_inf, estado, fecha_registro.
+ * La función recibe los siguientes parámetros: , , , , .
+ * La función devuelve verdadero.
+ * 
+ * Args:
+ *   usuario_receptor: El usuario que recibirá el bono
+ *   cantidad: el monto del contrato
+ *   num_contrato: 1, 2 o 3
+ *   hash: es el hash del contrato
+ *   nivel: El nivel del usuario que hizo el depósito.
+ * 
+ * Returns:
+ *   true si la consulta es exitosa.
+ */
 function Pagar_referencia($usuario_receptor, $cantidad, $num_contrato, $hash, $nivel)
 {
     include(dirname(__FILE__) . '/../../assets/db/db.php');
+    $razon_deposito = 'Bono Referido';
     $config = "SELECT `deposito_1`,`deposito_2`,`deposito_3` FROM `niveles_referido_bono` WHERE `nivel`= $nivel;";
     $config = mysqli_fetch_array(mysqli_query($conexion, $config));
     $porciento = $config['deposito_' . $num_contrato];
     $calculo = $cantidad * $porciento / 100;
-    return $calculo;
+    $tiempo = date('Y-m-d H:i:s');
+    $json_info = [
+        'linea_nivel' => $nivel,
+        'hash_de_contrato' => $hash,
+        'cantidad_base' => $cantidad,
+        'deposito_num' => $num_contrato
+    ];
+    $json_info = json_encode($json_info);
+    $insert = "INSERT INTO `transacciones` (`id_user`, `monto`, `razon`, `json_inf`, `status`, `fecha_registro`) VALUES ('$usuario_receptor', '$calculo', '$razon_deposito', '$json_info', 'Completado', '$tiempo')";
+    if (mysqli_query($conexion, $insert)) {
+        $update = "UPDATE `contractos` SET `rendimiento_entregado`=1 WHERE `hash`='$hash'";
+        mysqli_query($conexion, $update);
+    }
+    return true;
 }
+/**
+ * Comprueba si la dirección es una dirección TRC20.
+ * 
+ * Args:
+ *   address: La dirección del contrato.
+ * 
+ * Returns:
+ *   un valor booleano.
+ */
+function isTrc20($address){
+    return substr($address,0,1)=="T" and strlen($address)==34;
+ }
