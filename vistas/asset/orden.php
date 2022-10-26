@@ -68,7 +68,7 @@ if (isset($_SESSION['id_acceso_cliente'])) {
 } else {
 ?>
     <div class="wallet" style="text-align: center;">
-        <h5>Para poder usuar esta funcion entra a tu cuenta nuevamente</h5>
+        <h5>Para poder usar esta funcion entra a tu cuenta nuevamente</h5>
         <button type="submit" onclick="window.location.reload()" class="btn btn-smart-login text-white">Salir </button>
     </div>
 <?php

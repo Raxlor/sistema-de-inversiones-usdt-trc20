@@ -14,7 +14,7 @@ if (true) {
         $monto = $data['roi_diario'];
         $porciento = $data['porciento'];
         $fecha = date('Y-m-28 h:i:s a');
-      /* Actualizando la tabla contractos con el valor de . */
+        /* Actualizando la tabla contractos con el valor de . */
         $update = "UPDATE `contractos` SET `recibido`=`recibido`+$monto WHERE `id`=$id";
         mysqli_query($conexion, $update);
         // creo el historial de para que quede registro del corte diario por membresia

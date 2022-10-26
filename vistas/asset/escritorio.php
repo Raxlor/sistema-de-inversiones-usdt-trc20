@@ -68,52 +68,56 @@ if ($fale === 1) {
     <!-- add balance start -->
     <div class="container">
         <div class="row">
-            <div class="col-md-6 col-sm-12">
-                <div class="add-balance-area pd-top-40">
-                    <div class="ba-add-balance-inner   bg-white">
-                        <div class="row custom-gutters-20">
-                            <div class="col-6">
-                                <a class="btn btn-dark " href="javascript:void()" onclick="perfil()">Perfil <i
-                                        class="fas fa-user"></i> </a>
-                            </div>
-                            <div class="col-6">
-                                <a class="btn btn-dark " href="javascript:Mantenimiento()">Historial <i
-                                        class="fa fa-history"></i></a>
-                            </div>
-                            <div class="col-6">
-                                <a class="btn btn-dark" href="javascript:void(0)" onclick="deposito()">Depositar <i
-                                        class="fas fa-money-check"></i></a>
-                            </div>
-                            <div class="col-6">
-                                <a class="btn btn-dark " href="javascript:Mantenimiento()">Retirar <i
-                                        class="fas fa-handshake"></i></a>
+            <div class="col-md-6">
+                <div class="row">
+
+                    <div class="col-md-12 col-sm-12">
+                        <div class="add-balance-area pd-top-40">
+                            <div class="ba-add-balance-inner   bg-white">
+                                <div class="row custom-gutters-20">
+                                    <div class="col-6">
+                                        <a class="btn btn-dark " href="javascript:void()" onclick="perfil()">Perfil <i
+                                                class="fas fa-user"></i> </a>
+                                    </div>
+                                    <div class="col-6">
+                                        <a class="btn btn-dark " href="javascript:Mantenimiento()">Historial <i
+                                                class="fa fa-history"></i></a>
+                                    </div>
+                                    <div class="col-6">
+                                        <a class="btn btn-dark" href="javascript:void(0)" onclick="deposito()">Depositar
+                                            <i class="fas fa-money-check"></i></a>
+                                    </div>
+                                    <div class="col-6">
+                                        <a class="btn btn-dark " href="javascript:Mantenimiento()">Retirar <i
+                                                class="fas fa-handshake"></i></a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
             <div class="col-md-6 col-sm-12 ">
                 <div class="add-balance-area pd-top-40 ">
                     <div class="ba-add-balance-inner  bg-white">
                         <div class="col-md-12 ">
-                            <h3 class="text-center">Membresias</h3>
+                            <h3 class="text-center">Membresía</h3>
                             <?php
-/* Comprobar si el usuario tiene contrato. */
-$sql = "SELECT COUNT(*),SUM(`cantidad`) FROM `contractos` WHERE `id_user`=$id and`estado`=1";
-$data = mysqli_fetch_array(mysqli_query($conexion, $sql));
-if ($data == 0) {
-?>
+                            /* Comprobar si el usuario tiene contrato. */
+                            $sql = "SELECT COUNT(*),SUM(`cantidad`) FROM `contractos` WHERE `id_user`=$id and`estado`=1";
+                            $data = mysqli_fetch_array(mysqli_query($conexion, $sql));
+                            if ($data == 0) {
+                            ?>
                             <button type="button" onclick="inversion()"
                                 class="btn btn-smart-login text-white">Iniciar</button>
                             <?php
-} else {
-?>
+                            } else {
+                            ?>
                             <div class="row">
                                 <div class=" col-6">
                                     <span class="amount d-block w-100">
                                         Monto Actual:
-                                        <?php echo '$ ' . number_format($data_user['wallet_persona'], 2) ?>
+                                        <?php echo '$ ' . number_format($data[1], 2) ?>
                                         <img src="https://static.tronscan.org/production/logo/usdtlogo.png" alt=""
                                             width="20px">
                                     </span>
@@ -128,9 +132,11 @@ if ($data == 0) {
                                     <canvas id="myChart" width="100%" height="75%"></canvas>
                                 </div>
                             </div>
+                            <button type="button" onclick="inversion()" class="btn btn-dark btn-sm text-white">Area de
+                                membresía</button>
                             <?php
-}
-?>
+                                }
+ ?>
                         </div>
                     </div>
                 </div>

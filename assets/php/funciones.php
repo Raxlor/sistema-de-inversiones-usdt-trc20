@@ -735,6 +735,7 @@ function Wizard_level($usuario_receptor, $nivel, $id)
 
     //Pagar_referencia($usuario_receptor, $data['cantidad'], $num_contrato, $hash_para_enlance, $nivel);
 }
+
 /**
  * Inserta una fila en una tabla llamada "transacciones" con las siguientes columnas: id_usuario,
  * cantidad, motivo, json_inf, estado, fecha_registro.
@@ -751,6 +752,7 @@ function Wizard_level($usuario_receptor, $nivel, $id)
  * Returns:
  *   true si la consulta es exitosa.
  */
+
 function Pagar_referencia($usuario_receptor, $cantidad, $num_contrato, $hash, $nivel)
 {
     include(dirname(__FILE__) . '/../../assets/db/db.php');

@@ -308,6 +308,19 @@ function inversion() {
     },
   });
 }
+function referidos() {
+  $.ajax({
+    type: "POST",
+    url: "../vistas/asset/gestionar_referidos.php",
+    beforeSend: function () { },
+    success: function (resp) {
+      $("#body-global").html(resp);
+    },
+    error: function (error) {
+      alertify.error(error);
+    },
+  });
+}
 /**
  * It's a function that loads a page into a div.
  */
