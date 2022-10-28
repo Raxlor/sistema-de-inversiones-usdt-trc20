@@ -83,8 +83,7 @@ function enviar_email($Subject, $email, $mensaje)
         $informacion = 'Email enviado';
     }
     return $informacion;
-}
-;
+};
 
 /**
  * Si el usuario está detrás de un proxy, la función devolverá la dirección IP del proxy; de lo
@@ -522,8 +521,10 @@ try {
                 $id_user = $informacion->id_user;
                 $repuesta = ['status' => true, 'msg' => 'Contraseña cambiada.'];
                 $update = "UPDATE `usuario` SET `contraseña`='$new_password' WHERE `id`='$id_user'";
+                $sql = "UPDATE `codigos_de_restablecimiento` SET `estado`=1 WHERE `hash`='$hash'";
                 try {
                     mysqli_query($conexion, $update);
+                    mysqli_query($conexion, $sql);
                 } catch (\Exception $e) {
                     /* Detectar la excepción y enviar un correo electrónico al administrador. */
                     $repuesta = ('Excepción capturada: ' . $e->getMessage() . "\n en " . __FILE__ . ' en Linea ' . __LINE__);
@@ -623,9 +624,9 @@ function certificar_auxiliar_enlace()
         $verficando = "SELECT COUNT(*),id_user FROM `contractos` WHERE `id_user`=$sql_data[0]";
         $data_verificacion = mysqli_fetch_array(mysqli_query($conexion, $verficando));
         if ($data_verificacion[0] > 0) {
-            $sql_update = "UPDATE `auxiliar_enlace` SET `invirtiendo`=1 WHERE id_user=$data_verificacion[1]";
+            $sql_update = "UPDATE `auxiliar_enlace` SET `invirtiendo` = 1 WHERE id_user=$data_verificacion[1]";
         } else {
-            $sql_update = "UPDATE `auxiliar_enlace` SET `invirtiendo`=0 WHERE id_user=$sql_data[0] ";
+            $sql_update = "UPDATE `auxiliar_enlace` SET `invirtiendo` = 0 WHERE id_user=$sql_data[0] ";
         }
         mysqli_query($conexion, $sql_update);
     }
@@ -785,6 +786,7 @@ function Pagar_referencia($usuario_receptor, $cantidad, $num_contrato, $hash, $n
  * Returns:
  *   un valor booleano.
  */
-function isTrc20($address){
-    return substr($address,0,1)=="T" and strlen($address)==34;
- }
+function isTrc20($address)
+{
+    return substr($address, 0, 1) == "T" and strlen($address) == 34;
+}

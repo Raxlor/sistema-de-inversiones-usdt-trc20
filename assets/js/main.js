@@ -42,7 +42,7 @@ $("#reset").submit(function () {
         if (resp.status == true) {
           alertify.success(resp.msg);
           setTimeout(() => {
-           // location.href = "/";
+            location.href = "/";
           }, 1000);
         } else {
           alertify.error(resp.msg);

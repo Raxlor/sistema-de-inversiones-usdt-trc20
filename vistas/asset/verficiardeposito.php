@@ -85,7 +85,6 @@ while ($data = mysqli_fetch_array($sql_quety)) {
 
             $sql_alert = "INSERT INTO `alert_user`(`id_usuario`, `razon`, `mensaje`, `hora`, `time`) VALUES ($usuario,'Deposito','$monto USDT recibidos, exitosamente','$hora','$time')";
             mysqli_query($conexion, $sql_alert);
-            
         }
     }
 };

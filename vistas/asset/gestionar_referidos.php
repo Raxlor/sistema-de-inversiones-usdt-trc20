@@ -3,6 +3,7 @@ session_start();
 /* Comprobando si la sesión está configurada. */
 include '../../vistas/asset/header.html';
 include '../../assets/db/db.php';
+$id = $_SESSION['id_acceso_cliente'];
 if (isset($_SESSION['id_acceso_cliente'])) {
 ?>
 <main class="custom-height">
@@ -73,6 +74,18 @@ if (isset($_SESSION['id_acceso_cliente'])) {
                                     </div>
                                 </div>
                             </div>
+                            <?php
+                                $sql = "SELECT count(*) as cuenta,hash_para_enlance FROM `link_referido` WHERE `enlace_primario`=$id";
+                                $link = mysqli_fetch_array(mysqli_query($conexion, $sql));
+                            ?>
+                            <div class="col-md-12 py-2">
+                                <input id="link_referenc" class="form-control "
+                                    value='https://app.smartblessingcloud.com/?Registro&ref=<?php echo $link['hash_para_enlance'] ?>'
+                                    disabled>
+                                <br>
+                                <input type="submit" onclick="ejecutar()" value="Copiar link"
+                                    class="btn btn-sm btn-dark ">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -91,11 +104,10 @@ if (isset($_SESSION['id_acceso_cliente'])) {
                             <table id="transaciones" class="table table-hover table-fixed nowrap" style="width:100%">
                                 <thead>
                                     <tr>
-                                        <th>#</th>
-                                        <th>razon</th>
-                                        <th>status</th>
-                                        <th>monto</th>
+                                        <th>Usuario</th>
                                         <th>fecha</th>
+                                        <th>Referidos</th>
+                                        <th>Nivel</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -106,7 +118,7 @@ if (isset($_SESSION['id_acceso_cliente'])) {
                         </section>
                         <script>
                             $(document).ready(function () {
-                                actualizar_transaciones_tabla_orden()
+                                actualizar_transaciones_tabla_referido()
                             });
                         </script>
                     </div>

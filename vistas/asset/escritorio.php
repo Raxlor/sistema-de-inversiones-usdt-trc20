@@ -26,7 +26,7 @@ include '../../vistas/asset/header.html';
                             <h5 class="title">Billetera Disponible <br>
 
                                 <span class="amount d-block w-100">
-                                    <?php echo '$ ' . number_format($data_user['disponible'], 2) ?>
+                                    <?php echo '$' . number_format($data_user['disponible'], 2) ?>
                                     <img src="https://static.tronscan.org/production/logo/usdtlogo.png" alt=""
                                         width="20px">
                                 </span>
@@ -34,7 +34,7 @@ include '../../vistas/asset/header.html';
                         <div class="carousel-item">
                             <h5 class="title">Billetera Deposito <br>
                                 <span class="amount d-block w-100">
-                                    <?php echo '$ ' . number_format($data_user['wallet_persona'], 2) ?>
+                                    <?php echo '$' . number_format($data_user['wallet_persona'], 2) ?>
                                     <img src="https://static.tronscan.org/production/logo/usdtlogo.png" alt=""
                                         width="20px">
                                 </span>
@@ -106,7 +106,7 @@ if ($fale === 1) {
                             /* Comprobar si el usuario tiene contrato. */
                             $sql = "SELECT COUNT(*),SUM(`cantidad`) FROM `contractos` WHERE `id_user`=$id and`estado`=1";
                             $data = mysqli_fetch_array(mysqli_query($conexion, $sql));
-                            if ($data == 0) {
+                            if ($data[0] == 0) {
                             ?>
                             <button type="button" onclick="inversion()"
                                 class="btn btn-smart-login text-white">Iniciar</button>
@@ -114,17 +114,21 @@ if ($fale === 1) {
                             } else {
                             ?>
                             <div class="row">
-                                <div class=" col-6">
-                                    <span class="amount d-block w-100">
-                                        Monto Actual:
+                                <div class="col-6">
+                                    <span class=" d-block w-100">
+                                        <h6>
+                                            Monto Actual:
+                                        </h6>
                                         <?php echo '$ ' . number_format($data[1], 2) ?>
                                         <img src="https://static.tronscan.org/production/logo/usdtlogo.png" alt=""
                                             width="20px">
                                     </span>
                                 </div>
-                                <div class=" col-6">
-                                    <span class="amount d-block w-100">
-                                        Membresias activas:
+                                <div class="col-6">
+                                    <span class=" d-block w-100">
+                                       <h6>
+                                           Membresias:
+                                       </h6> 
                                         <?php echo $data[0] ?>
                                     </span>
                                 </div>

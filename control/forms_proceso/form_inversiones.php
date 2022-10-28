@@ -12,7 +12,9 @@ $json = json_decode($json);
 $resp_error = array('mensaje' => 'No hay informacion que guardar');
 $resp_error = json_encode($resp_error);
 $timestamp = (time());
-$tiempo = gmdate("Y-m-d H:i:s", $timestamp);
+$tiempo = date("Y-m-d H:i:s", $timestamp);
+$timestamp_suma = date("Y-m-d H:i:s",strtotime($tiempo." 2 days"));
+
 $hash = md5(time());
 $id_producto = $json->produc_id;
 #fin utilidad
@@ -62,14 +64,14 @@ if (!isset($_SESSION['id_acceso_cliente'])) {
                 $data = mysqli_fetch_array(mysqli_query($conexion, $sql));
                 /* Al verificar si el último número de contrato es nulo, si lo es, establecerá el
                 número de contrato en 1. Si no es nulo, agregará 1 al último número de contrato. */
-                if (!is_null($data[0])) {
+                if (!is_null($data)) {
                     $aux = $data[0] + 1;
                 }else {
                     $aux =  1;
                 }
                 $sql = "UPDATE `usuario` SET `wallet_persona`=`wallet_persona`-$monto WHERE `id`=$id;";
                 mysqli_query($conexion, $sql);
-                $sql = "INSERT INTO `contractos`(`id_user`, `cantidad`, `recibido`, `estado`, `fecha_start`, `razon`, `hash`, `num_contrato`) VALUES ($id,$monto,0,1,'$tiempo','$id_producto','$hash',$aux)";
+                $sql = "INSERT INTO `contractos`(`id_user`, `cantidad`, `recibido`, `estado`, `fecha_start`, `razon`, `hash`, `num_contrato`) VALUES ($id,$monto,0,1,'$timestamp_suma','$id_producto','$hash',$aux)";
 
                 // le aumento a la membresia para actualizarla
                 $sql_productos = "UPDATE `productos` SET `utilizado`= `utilizado`+ 1,`capital_total`=`capital_total`+$monto  WHERE `nombre`='$id_producto'";

@@ -155,7 +155,7 @@ function actualizar_transaciones_tabla_orden() {
       responsive: responsive,
       ajax: {
         url: "../vistas/asset/transacciones.php",
-        type:"POST",
+        type: "POST",
         dataSrc: "data",
       },
       columns: [
@@ -178,7 +178,41 @@ function actualizar_transaciones_tabla_orden() {
     });
   }, 1500);
 }
+function actualizar_transaciones_tabla_referido() {
+  $("#spinner-load-generar-table").removeAttr("hidden");
+  $("#section_table").attr("hidden", true);
 
+  setTimeout(() => {
+    $("#spinner-load-generar-table").attr("hidden", true);
+    $("#section_table").removeAttr("hidden");
+
+    $("#transaciones").DataTable({
+      stateSave: status_save,
+      destroy: destroy_glob,
+      responsive: responsive,
+      ajax: {
+        url: "../vistas/asset/referidos.php",
+        type: "POST",
+        dataSrc: "data",
+      },
+
+      columns: [
+        {
+          data: "nick",
+        },
+        {
+          data: "fecha",
+        },
+        {
+          data: "referidos",
+        },
+        {
+          data: "nivel",
+        }
+      ],
+    });
+  }, 1500);
+}
 function actualizar_contrato_tabla() {
   $("#spinner-load-generar-table").removeAttr("hidden");
   $("#section_table").attr("hidden", true);
@@ -192,7 +226,7 @@ function actualizar_contrato_tabla() {
       responsive: responsive,
       ajax: {
         url: "../vistas/asset/contrato.php",
-        type:"POST",
+        type: "POST",
         dataSrc: "data",
       },
       columns: [

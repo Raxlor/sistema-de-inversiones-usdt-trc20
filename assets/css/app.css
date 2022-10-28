@@ -380,14 +380,14 @@ body {
     border-radius: 100px;
     position: absolute;
     right: 1.2%;
-    top: 1.2%;
+    top: 14.2%;
     cursor: pointer;
     animation: auto;
   }
 }
 @media (max-width: 1000px) {
   .dropdown-menu {
-    left: 65%;
+    left: 60%;
     position: absolute !important;
     top: 98% !important;
     /* right: 1.5%; */
