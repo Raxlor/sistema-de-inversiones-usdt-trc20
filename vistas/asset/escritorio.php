@@ -50,16 +50,6 @@ include '../../vistas/asset/header.html';
 
 
                 </h5>
-                <?php $fale = 0;
-if ($fale === 1) {
-?>
-                <!--
-                        <h5 class="text-succes">Total Inventido</h5><span class="amount"><?php echo '$ ' . number_format(2500, 2) ?></span>
-                        <h6 class="title">Contratos</h6><span class="amount"><?php echo 5 ?></span>
-                    -->
-                <?php
-}
-?>
             </div>
         </div>
         </dv>
@@ -95,6 +85,28 @@ if ($fale === 1) {
                             </div>
                         </div>
                     </div>
+                    <?php
+    $sql_link = "SELECT COUNT(*) FROM `link_referido` where `enlace_primario`=$id";
+    $referidos = mysqli_fetch_array(mysqli_query($conexion, $sql_link));
+    if ($referidos[0] > 0) {
+    ?>
+
+                    <div class="col-md-12 col-sm-12">
+                        <div class="add-balance-area py-2">
+                            <div class="ba-add-balance-inner   bg-white">
+                                <div class="row custom-gutters-20">
+                                    <div class="col-12  ">
+                                        <a class="btn btn-dark " href="javascript:void()"
+                                            onclick="referidos()">Referidos <i class="fas fa-users"></i> </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <?php
+    }
+                    ?>
+
                 </div>
             </div>
             <div class="col-md-6 col-sm-12 ">
@@ -126,9 +138,9 @@ if ($fale === 1) {
                                 </div>
                                 <div class="col-6">
                                     <span class=" d-block w-100">
-                                       <h6>
-                                           Membresias:
-                                       </h6> 
+                                        <h6>
+                                            Membresias:
+                                        </h6>
                                         <?php echo $data[0] ?>
                                     </span>
                                 </div>
@@ -139,8 +151,8 @@ if ($fale === 1) {
                             <button type="button" onclick="inversion()" class="btn btn-dark btn-sm text-white">Area de
                                 membresía</button>
                             <?php
-                                }
- ?>
+                            }
+                            ?>
                         </div>
                     </div>
                 </div>

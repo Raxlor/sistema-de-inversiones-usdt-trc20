@@ -5,6 +5,23 @@ include '../../vistas/asset/header.html';
 include '../../assets/db/db.php';
 $id = $_SESSION['id_acceso_cliente'];
 if (isset($_SESSION['id_acceso_cliente'])) {
+    $referidos_sql ="SELECT * FROM `link_referido` WHERE `enlace_primario` = $id";
+    $data_referidos = mysqli_fetch_array(mysqli_query($conexion,$referidos_sql));
+    $_SESSION['hash']=$data_referidos['hash_para_enlance'];
+    $nivel="SELECT MAX(`nivel`) FROM `condiciones_de_niveles`";
+    $data_nivel_max=mysqli_fetch_array(mysqli_query($conexion,$nivel));
+    echo $nivel[0];
+    if ($data_referidos['nivel_actual']<$data_nivel_max[0]) {
+         $porciento =round( $data_referidos['cantidad_referidos']*100/6, 2); ;
+        $nivel_text=$porciento.'%';
+    }else {
+        $nivel_text='Rango maximo';
+        $porciento='100';
+
+    }
+    $fecha=date('Y-m');
+    $sql= "SELECT SUM(`monto`), date_format(`fecha_registro`,'%Y-%m') FROM `transacciones` WHERE `id_user`=$id and `razon`='Bono Referido' and  date_format(`fecha_registro`,'%Y-%m') = '$fecha'";
+    $data_fecha=mysqli_fetch_array(mysqli_query($conexion,$sql))
 ?>
 <main class="custom-height">
     <!-- balance start -->
@@ -39,16 +56,16 @@ if (isset($_SESSION['id_acceso_cliente'])) {
                         </section>
                         <h5>Estadística de Rango</h5>
                         <div class="row">
-                            <div class="col-6">Rango Actual: 2 </div>
-                            <div class="col-6">Referidos Actuales: 7 </div>
+                            <div class="col-6">Rango Actual: <?php echo $data_referidos['nivel_actual'] ?> </div>
+                            <div class="col-6">Referidos Actuales: <?php echo $data_referidos['cantidad_referidos'] ?>  </div>
                             <div class="col-12 pt-2 pb-2">
                                 <div class="progress">
 
                                     <div class="progress-bar progress-bar-striped progress-bar-animated "
                                         role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"
-                                        style="width: 100%">
+                                        style="width: <?php echo $porciento; ?>%">
                                         <span class="text-center">
-                                            Rango maximo
+                                            <?php echo $nivel_text; ?>
                                         </span>
                                     </div>
                                 </div>
@@ -57,10 +74,10 @@ if (isset($_SESSION['id_acceso_cliente'])) {
                                 <hr>
                             </div>
                             <div class="col-12">Capital de patrocinio:
-                                <?php echo '$ ' . number_format(15000, 2) ?>
+                                <?php echo '$ ' . number_format($data_referidos['dinero_activo'], 2) ?>
                             </div>
                             <div class="col-6 pt-2">Bono recibido:
-                                <?php echo number_format(100, 2) ?>
+                                <?php echo number_format( $data_fecha[0], 2) ?>
                             </div>
                             <div class="col-6 pt-2">Bono maximo:
                                 <?php echo number_format(1000, 2) ?>

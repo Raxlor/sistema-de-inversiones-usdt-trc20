@@ -83,7 +83,8 @@ function enviar_email($Subject, $email, $mensaje)
         $informacion = 'Email enviado';
     }
     return $informacion;
-};
+}
+;
 
 /**
  * Si el usuario está detrás de un proxy, la función devolverá la dirección IP del proxy; de lo
@@ -771,6 +772,8 @@ function Pagar_referencia($usuario_receptor, $cantidad, $num_contrato, $hash, $n
     ];
     $json_info = json_encode($json_info);
     $insert = "INSERT INTO `transacciones` (`id_user`, `monto`, `razon`, `json_inf`, `status`, `fecha_registro`) VALUES ('$usuario_receptor', '$calculo', '$razon_deposito', '$json_info', 'Completado', '$tiempo')";
+    $actualizar = "UPDATE `usuario` SET `disponible`=`disponible`+$calculo,`disponible_historico`=`disponible_historico`+$calculo WHERE `id`=$usuario_receptor";
+    mysqli_query($conexion, $actualizar);
     if (mysqli_query($conexion, $insert)) {
         $update = "UPDATE `contractos` SET `rendimiento_entregado`=1 WHERE `hash`='$hash'";
         mysqli_query($conexion, $update);

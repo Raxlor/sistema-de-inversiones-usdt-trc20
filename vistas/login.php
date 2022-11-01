@@ -72,7 +72,7 @@ if (isset($_GET['Registro'])) {
         header('location:/');
     } else {
         $_SESSION['Validacion_hash']=$_GET['hash'];
-        include(dirname(__FILE__) . '/../html/reset.html');
+        include(dirname(__FILE__) . '/../html/reset.php');
     }
 } else {
     // indentifico si es un login normal o un intento de registro

@@ -154,10 +154,10 @@ try {
                                } else {
                                 require_once '../../assets/php/funciones.php';
                                 ?>
-                              <div class="col-md-12"> 
-                                    <code>
-                                    para ser Patrocinador nesecita tener inversion con nosotro
-                                </code>
+                              <div class="col-md-12">
+                                    <h6>
+                                    Para participar en el plan de recomendación, le solicitamos realizar su membresía.
+                                </h6>
                                 </div>
                                <?php
                                  }

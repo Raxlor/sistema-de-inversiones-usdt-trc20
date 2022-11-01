@@ -4,12 +4,19 @@ $("#login_form").submit(function () {
   if (false) {
     alertify.error("Captcha no verificado");
   } else {
-    contraseña = $("#pass").val();
-    cedula = $("#cedula").val();
+    var formData = new FormData(document.getElementById("login_form"));
     $.ajax({
       type: "POST",
-      data: "nick=" + cedula + "&contraseña=" + contraseña,
+      data: formData,
       url: "./control/login.php",
+      dataType: "json",
+      data: formData,
+      cache: false,
+      contentType: false,
+      processData: false,
+      beforeSend: function () {
+        //nada de momento
+      },
       success: function (resp) {
         if (resp.access === true) {
           alertify.success("Acceso aprobado");
@@ -27,17 +34,25 @@ $("#login_form").submit(function () {
   }
 });
 
-$("#reset").submit(function () {
+$("#reset_form").submit(function () {
   // var response = grecaptcha.getResponse();
   if (false) {
     alertify.error("Captcha no verificado");
   } else {
-    code = $("#code").val();
-    myPassword = $("#myPassword").val();
+    var formData = new FormData(document.getElementById("reset_form"));
+ 
     $.ajax({
       type: "POST",
-      data: "code=" + code + "&myPassword=" + myPassword,
-      url: "/control/forms_proceso/form_restablecimiento.php",
+      data:formData,
+      url: "/control/forms_proceso/form_restablecimiento.php",   type: "post",
+      dataType: "json",
+      data: formData,
+      cache: false,
+      contentType: false,
+      processData: false,
+      beforeSend: function () {
+        //nada de momento
+      },
       success: function (resp) {
         if (resp.status == true) {
           alertify.success(resp.msg);

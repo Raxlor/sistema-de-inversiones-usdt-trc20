@@ -32,14 +32,14 @@ if (isset($_POST['email'])) {
         /* Inserting the data into the database. */
         $sql = "INSERT INTO `codigos_de_restablecimiento`(`id_user`, `code`, `hash`,json_info ) VALUES ($id,'$otp','$hash','$data');";
         if (mysqli_query($conexion, $sql)) {
-           
+
             /* la id 1 pertenece a esa plantilla */
             $sql = "SELECT * FROM `plantillas_email` where id=1";
             $data = mysqli_fetch_array(mysqli_query($conexion, $sql));
 
             /* Replacing the values in the array with the values in the database. */
-            $palabras_claves = array("@nombre@", "@otp@", "@link@");
-            $palabras_claves_changer = array($nombre, $otp, 'https://app.smartblessingcloud.com/?hash=' . $hash);
+            $palabras_claves = array("@nombre@", "@link@");
+            $palabras_claves_changer = array($nombre,'https://app.smartblessingcloud.com/?hash=' . $hash.'&otp='.$otp);
             $html = str_replace($palabras_claves, $palabras_claves_changer, $data['estructura']);
             /* Sending the email. */
             enviar_email('Restablecer', $email, $html);

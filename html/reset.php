@@ -1,9 +1,9 @@
-<form class="" method="post" id="reset" action="javascript:void(0)" enctype="multipart/form-data">
+<form class="" method="post" id="reset_form" action="javascript:void(0)" enctype="multipart/form-data">
     <div style="text-align: center; margin-bottom:20px;">
         <h4 style="color:#094267">RESTABLECER CONTREASEÑA </h4>
     </div>
     <label class="single-input-wrap">
-        <input type="text" minlength="6" name="code" id="code" ok autocomplete="off"required maxlength="6" placeholder="Código de verificación">
+        <input type="number" minlength="6" name="code" id="code" value="<?php echo $_GET['otp'] ?>" autocomplete="off" required maxlength="6" placeholder="Código de verificación">
     </label>
     <div class="row">
         <div class="col-6">
