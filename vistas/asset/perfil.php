@@ -116,14 +116,6 @@ try {
                 </div>
                 <?php
                 } ?>
-                <div class="card-custom">
-                    <div class="add-balance-area pd-top-40">
-                        <div class="ba-add-balance-inner   bg-white">
-                            <div class="row custom-gutters-20 p-2">
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
             <div class="col-md-6 col-sm-12">
                 <div class="add-balance-area pd-top-40">

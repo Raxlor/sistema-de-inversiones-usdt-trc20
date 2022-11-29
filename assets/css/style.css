@@ -1542,6 +1542,7 @@ ul {
   border: 1px solid #ececec;
   padding: 20px 22px 0 22px;
   border-radius: 6px;
+
 }
 .ba-add-balance-inner .btn {
   width: 100%;
@@ -2315,7 +2316,7 @@ ul {
 }
 
 .bg-white {
-  background-color: #fff !important;
+  background-color: #ffffffa6 !important;
 }
 
 /*

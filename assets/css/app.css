@@ -404,11 +404,11 @@ body {
     border-radius: 0px 0px 1px 10px !important;
   }
   .perfil_img {
-    width: 45px;
+    width: 35px;
     border-radius: 100px;
     position: absolute;
     right: 1.2%;
-    top: 1.2%;
+    top: 18.2%;
     cursor: pointer;
     animation: auto;
   }

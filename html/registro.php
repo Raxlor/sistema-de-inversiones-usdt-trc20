@@ -9,7 +9,7 @@
 
                 <div class="col-6">
                     <label class="single-input-wrap">
-                        <input type="text" name="username" id="username" required maxlength="10" placeholder="Usuario">
+                        <input type="text" name="username" id="username" required maxlength="20" placeholder="Usuario">
                     </label>
                 </div>
                 <div class="col-6">

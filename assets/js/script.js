@@ -42,6 +42,22 @@ function deposito() {
   });
 }
 
+
+function retiros() {
+  $.ajax({
+    type: "POST",
+    url: "../vistas/asset/retirar.php",
+    beforeSend: function () { },
+    success: function (resp) {
+      $("#body-global").html(resp);
+    },
+    error: function (error) {
+      alertify.error(error);
+    },
+  });
+}
+
+
 function conteo_regresivo(tiempo_end_wallet) {
   var timestamp = tiempo_end_wallet - Date.now();
   timestamp /= 1000; // from ms to seconds

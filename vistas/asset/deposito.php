@@ -31,7 +31,7 @@ if ($data[0]>0) {
                 <div style="height: 50px;width: 50px;display: inline-block;line-height: 48px;margin-bottom: 13px; visibility: hidden;">
                     <img src="#" alt="img">
                 </div>
-                <h5 style="color: white !important;">Disponible <span class=""><?php echo '$ ' . number_format($monto[0], 2) ?></span>
+                <h5 style="color: white !important;">Billetera Deposito <span class=""><?php echo '$ ' . number_format($monto[0], 2) ?></span>
                 </h5>
 
 

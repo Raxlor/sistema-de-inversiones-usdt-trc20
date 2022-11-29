@@ -10,18 +10,22 @@ if (isset($_SESSION['id_acceso_cliente'])) {
     $_SESSION['hash']=$data_referidos['hash_para_enlance'];
     $nivel="SELECT MAX(`nivel`) FROM `condiciones_de_niveles`";
     $data_nivel_max=mysqli_fetch_array(mysqli_query($conexion,$nivel));
-    echo $nivel[0];
+
     if ($data_referidos['nivel_actual']<$data_nivel_max[0]) {
-         $porciento =round( $data_referidos['cantidad_referidos']*100/6, 2); ;
+         $porciento =round( $data_referidos['cantidad_referidos']*100/$data_nivel_max[0]/2, 2); ;
         $nivel_text=$porciento.'%';
     }else {
         $nivel_text='Rango maximo';
         $porciento='100';
 
     }
-    $fecha=date('Y-m');
-    $sql= "SELECT SUM(`monto`), date_format(`fecha_registro`,'%Y-%m') FROM `transacciones` WHERE `id_user`=$id and `razon`='Bono Referido' and  date_format(`fecha_registro`,'%Y-%m') = '$fecha'";
-    $data_fecha=mysqli_fetch_array(mysqli_query($conexion,$sql))
+    $sql= "SELECT `Bono_recibido`,disponible FROM `usuario` WHERE `id`=$id";
+    $data_fecha=mysqli_fetch_array(mysqli_query($conexion,$sql));
+    $limite_sql="SELECT SUM(`cantidad`) FROM `contractos` WHERE `id_user`=$id and `estado`=1";
+    $data_limite=mysqli_fetch_array(mysqli_query($conexion,$limite_sql));
+    $porciento_limite =round($data_fecha[0]*100/$data_limite[0], 2); ;
+
+
 ?>
 <main class="custom-height">
     <!-- balance start -->
@@ -36,8 +40,7 @@ if (isset($_SESSION['id_acceso_cliente'])) {
                     style="height: 50px;width: 50px;display: inline-block;line-height: 48px;margin-bottom: 13px; visibility: hidden;">
                     <img src="#" alt="img">
                 </div>
-                <!--<h5 style="color: white !important;">Disponible <span class=""><?php echo '$ ' . number_format($monto[0], 2) ?></span>
-                </h5> -->
+             
             </div>
         </div>
     </div>
@@ -77,17 +80,17 @@ if (isset($_SESSION['id_acceso_cliente'])) {
                                 <?php echo '$ ' . number_format($data_referidos['dinero_activo'], 2) ?>
                             </div>
                             <div class="col-6 pt-2">Bono recibido:
-                                <?php echo number_format( $data_fecha[0], 2) ?>
+                                <?php echo number_format($data_fecha[0], 2) ?>
                             </div>
                             <div class="col-6 pt-2">Bono maximo:
-                                <?php echo number_format(1000, 2) ?>
+                                <?php echo number_format($data_limite[0], 2) ?>
                             </div>
                             <div class="col-12 pt-2">
                                 <div class="progress">
                                     <div class="progress-bar progress-bar-striped progress-bar-animated "
                                         role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"
-                                        style="width: 50%">
-                                        50%
+                                        style="width: <?php echo $porciento_limite ?>%">
+                                        <?php echo $porciento_limite ?>%
                                     </div>
                                 </div>
                             </div>
@@ -107,7 +110,7 @@ if (isset($_SESSION['id_acceso_cliente'])) {
                     </div>
                 </div>
             </div>
-            <div class="col-md-6 col-sm-12">
+            <div class="col-md-6 col-sm-12 pb-5">
                 <div class="add-balance-area pd-top-40">
                     <div class="ba-add-balance-inner bg-white" id="">
                         <h6 class="title">Historial de transacciones</h6>

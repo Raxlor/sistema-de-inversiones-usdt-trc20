@@ -21,7 +21,7 @@ if (isset($_GET['deslog'])) {
 <html lang="es">
 <style>
     body {
-        background: url(https://i.ibb.co/k0W4jcg/Background-2.jpg)
+        background: url(https://i.ibb.co/k0W4jcg/Background-2.jpg)!important;    background-position: center!important;
     }
 </style>
 
@@ -29,7 +29,7 @@ if (isset($_GET['deslog'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
     <title>
-        <?php print $name_Web_title; ?>
+        <?php print  $name_Web_title; ?>
     </title>
     <link rel="icon"
         href="https://smartblessingcloud.com/wp-content/uploads/2022/09/cropped-cropped-logo-icon-32x32.png"

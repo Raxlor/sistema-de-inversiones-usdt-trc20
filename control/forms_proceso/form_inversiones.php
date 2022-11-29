@@ -12,8 +12,8 @@ $json = json_decode($json);
 $resp_error = array('mensaje' => 'No hay informacion que guardar');
 $resp_error = json_encode($resp_error);
 $timestamp = (time());
-$tiempo = date("Y-m-d H:i:s", $timestamp);
-$timestamp_suma = date("Y-m-d H:i:s",strtotime($tiempo." 2 days"));
+$tiempo = date("Y-m-d h:i:s a", $timestamp);
+$timestamp_suma = date("Y-m-d h:i:s a",strtotime($tiempo." 2 days"));
 
 $hash = md5(time());
 $id_producto = $json->produc_id;

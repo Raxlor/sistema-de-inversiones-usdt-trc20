@@ -29,7 +29,7 @@ if (isset($_SESSION['id_acceso_cliente'])) {
     $_SESSION['id_order'] = $resp->ordenId;
 
     $timestamp = ($resp->time / 1000);
-    $tiempo = gmdate("Y-m-d H:i:s", $timestamp - 14400);
+    $tiempo = gmdate("Y-m-d h:i:s a", $timestamp - 14400);
     $resp = json_encode($resp);
     $consulta = "SELECT COUNT(*) FROM `transacciones` WHERE `id_user` =$id and `json_inf`='$resp'";
     $data = mysqli_fetch_array(mysqli_query($conexion, $consulta));

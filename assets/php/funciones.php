@@ -9,7 +9,7 @@
  ██░░└┐░░░░░░░░░░░░░░░┌┘░░██
  ██░░┌┘▄▄▄▄▄░░░░░▄▄▄▄▄└┐░░██
  ██▌░│██████▌░░░▐██████│░▐██
- ███░│▐███▀▀░░▄░░▀▀███▌│░███             THE FUNCTION 0.2
+ ███░│▐███▀▀░░▄░░▀▀███▌│░███             THE FUNCTION 0.3
  ██▀─┘░░░░░░░▐█▌░░░░░░░└─▀██
  ██▄░░░▄▄▄▓░░▀█▀░░▓▄▄▄░░░▄██
  ████▄─┘██▌░░░░░░░▐██└─▄████
@@ -83,8 +83,7 @@ function enviar_email($Subject, $email, $mensaje)
         $informacion = 'Email enviado';
     }
     return $informacion;
-}
-;
+};
 
 /**
  * Si el usuario está detrás de un proxy, la función devolverá la dirección IP del proxy; de lo
@@ -459,7 +458,6 @@ function validar_codigo($codigo)
         Auto_report('Excepción capturada: ' . $e->getMessage() . "\n en " . __FILE__ . ' en Linea ' . __LINE__);
         $retorno = 'Enlace invalido';
     }
-    header("refresh:0.5;url=/");
 }
 /**
  * Comprueba si el hash existe en la base de datos y si su estado es 0 (no utilizado).
@@ -686,46 +684,64 @@ function Contar_referidos_del_cliente()
         mysqli_query($conexion, $sql_update);
     }
 }
+function check_if_you_are_invited()
+{
+    include(dirname(__FILE__) . '/../../assets/db/db.php');
+    $sql = "SELECT enlace_primario FROM `link_referido` where 1";
+    $query = mysqli_query($conexion, $sql);
+    while ($data = mysqli_fetch_array($query)) {
+        $id = $data[0];
+        $sql_certificador = "SELECT * FROM `auxiliar_enlace` where `id_user` = $id";
+        $data2 = mysqli_fetch_array(mysqli_query($conexion, $sql_certificador));
+        if (is_null($data2)) {
+            $valor = 0;
+        } else {
+            $valor = 1;
+        }
+        $update = "UPDATE `link_referido` SET `invitado`=$valor WHERE `enlace_primario`=$id";
+        mysqli_query($conexion, $update);
+    }
+}
 /**
- * Una función que es llamada cada minuto por un trabajo cron. Comprueba la base de datos de los
- * usuarios que han realizado un depósito y aún no han recibido su bono.
+ * Si el usuario no está invitado, actualice la base de datos para indicar que el usuario ha recibido
+ * su bono.
  */
 function bonificacion()
 {
     include(dirname(__FILE__) . '/../../assets/db/db.php');
-    /*
-     Reglas de bonificacion en la base de dato
-     */
-    $sql = "SELECT `hash_para_enlance`,contractos.* FROM `auxiliar_enlace` LEFT JOIN contractos on contractos.id_user = auxiliar_enlace.id_user WHERE `invirtiendo`=1 and rendimiento_entregado=0";
-    $query = mysqli_query($conexion, $sql);
-    while ($data = mysqli_fetch_array($query)) {
-        $sql_indentificador = "SELECT `nivel_actual`,enlace_primario FROM `link_referido` WHERE `hash_para_enlance`='$data[0]'";
-        $data_indentifcador = mysqli_fetch_array(mysqli_query($conexion, $sql_indentificador));
-        $nivel = $data_indentifcador[0];
-        $usuario_receptor = $data_indentifcador[1];
-        if ($nivel >= 2) {
-            /* Llamar a la función Wizard_level() y pasar los parámetros ,  y
-             [0]. */
-            /* Llamando a la función Wizard_level, que se define en el archivo Wizard_level.php. */
-            Wizard_level($usuario_receptor, $nivel, $data['id_user']);
+
+
+
+    $sql_contratos = "SELECT * FROM `contractos` WHERE 1 and `rendimiento_entregado`=0;";
+    $query = mysqli_query($conexion, $sql_contratos);
+    while ($contratos_info = mysqli_fetch_array($query)) {
+        // en caso de que invertir sin ser invitado skip a este paso
+        $sql_search = "SELECT `hash_para_enlance` FROM `auxiliar_enlace` WHERE `id_user`=$contratos_info[1]";
+        $data_hash = mysqli_fetch_array(mysqli_query($conexion, $sql_search));
+        if (!is_null($data_hash)) {
+
+            $sql_link = "SELECT * FROM `link_referido` WHERE `hash_para_enlance`='$data_hash[0]'";
+            $data_link = mysqli_fetch_array(mysqli_query($conexion, $sql_link));
+            Pagar_referencia($data_link[1], $contratos_info['cantidad'], $contratos_info['num_contrato'], $contratos_info['hash'], 1);
+            if ($data_link['invitado'] == 1) {
+                $sql_search = "SELECT `hash_para_enlance` FROM `auxiliar_enlace` WHERE `id_user`=$data_link[1]";
+                $data_hash = mysqli_fetch_array(mysqli_query($conexion, $sql_search));
+
+                $sql_link = "SELECT * FROM `link_referido` WHERE `hash_para_enlance`='$data_hash[0]'";
+                $data_link = mysqli_fetch_array(mysqli_query($conexion, $sql_link));
+                Wizard_level($data_link[1], 2, $contratos_info['hash']);
+            }
+        } else {
+            $update = "UPDATE `contractos` SET `rendimiento_entregado`=1 WHERE `id`=$contratos_info[0]";
+            mysqli_query($conexion, $update);
         }
-        $num_contrato = ($data['num_contrato'] <= 3) ? $data['num_contrato'] : 3; //* aca no asegurarmos de fijar un limite si los deposito ya va por el numero 4 lo interpretaremos como el 3r caso ya que solo hay 3 coso y buscar otro mas grande generaria errores
-        Pagar_referencia($usuario_receptor, $data['cantidad'], $num_contrato, $data['hash'], 1);
     }
-    $update = "UPDATE `contractos` SET `rendimiento_entregado`=1 WHERE 1";
-    mysqli_query($conexion, $update);
 }
 
-function Wizard_level($usuario_receptor, $nivel, $id)
+function Wizard_level($usuario_receptor, $nivel, $hash_para_enlance)
 {
     include(dirname(__FILE__) . '/../../assets/db/db.php');
-    echo $sql = "SELECT * FROM `link_referido` where enlace_primario=$id";
-    $data = mysqli_fetch_array(mysqli_query($conexion, $sql));
-    if (!is_null($data)) {
-        # code...
-    }
-    $hash_para_enlance = $data['hash_para_enlance'];
-    $SQL = "SELECT `hash_para_enlance`,contractos.* FROM `auxiliar_enlace` LEFT JOIN contractos on contractos.id_user = auxiliar_enlace.id_user WHERE `invirtiendo`=1 and rendimiento_entregado_LVL2=0 and `hash_para_enlance` LIKE '$hash_para_enlance'";
+    $SQL = "SELECT `hash_para_enlance`,contractos.* FROM `auxiliar_enlace` LEFT JOIN contractos on contractos.id_user = auxiliar_enlace.id_user WHERE `invirtiendo`=1 and rendimiento_entregado_LVL2=0 and `hash` LIKE '$hash_para_enlance'";
     $query = mysqli_query($conexion, $SQL);
     while ($data = mysqli_fetch_array($query)) {
         $num_contrato = ($data['num_contrato'] <= 3) ? $data['num_contrato'] : 3; //* aca no asegurarmos de fijar un limite si los deposito ya va por el numero 4 lo interpretaremos como el 3r caso ya que solo hay 3 coso y buscar otro mas grande generaria errores
@@ -734,8 +750,6 @@ function Wizard_level($usuario_receptor, $nivel, $id)
         $update = "UPDATE `contractos` SET `rendimiento_entregado_LVL2`=1 WHERE id=$data[1]";
         mysqli_query($conexion, $update);
     }
-
-    //Pagar_referencia($usuario_receptor, $data['cantidad'], $num_contrato, $hash_para_enlance, $nivel);
 }
 
 /**
@@ -755,6 +769,20 @@ function Wizard_level($usuario_receptor, $nivel, $id)
  *   true si la consulta es exitosa.
  */
 
+/**
+ * Toma una identificación de usuario, una identificación de contrato, un hash de contrato y un nivel,
+ * y luego le paga al usuario una bonificación basada en el monto del contrato y el nivel.
+ * 
+ * Args:
+ *   usuario_receptor: El usuario que recibirá el bono
+ *   cantidad: la cantidad de dinero que el usuario ha depositado
+ *   num_contrato: 1, 2, 3
+ *   hash: el hash del contrato
+ *   nivel: 1 o 2
+ * 
+ * Returns:
+ *   un valor booleano de verdadero.
+ */
 function Pagar_referencia($usuario_receptor, $cantidad, $num_contrato, $hash, $nivel)
 {
     include(dirname(__FILE__) . '/../../assets/db/db.php');
@@ -763,7 +791,9 @@ function Pagar_referencia($usuario_receptor, $cantidad, $num_contrato, $hash, $n
     $config = mysqli_fetch_array(mysqli_query($conexion, $config));
     $porciento = $config['deposito_' . $num_contrato];
     $calculo = $cantidad * $porciento / 100;
-    $tiempo = date('Y-m-d H:i:s');
+    $calculo = overdraft_bonus($usuario_receptor, $calculo);
+    $tiempo = date('Y-m-d h:i:s a');
+    $fecha = date('Y-m-d h:i:s a');
     $json_info = [
         'linea_nivel' => $nivel,
         'hash_de_contrato' => $hash,
@@ -772,13 +802,54 @@ function Pagar_referencia($usuario_receptor, $cantidad, $num_contrato, $hash, $n
     ];
     $json_info = json_encode($json_info);
     $insert = "INSERT INTO `transacciones` (`id_user`, `monto`, `razon`, `json_inf`, `status`, `fecha_registro`) VALUES ('$usuario_receptor', '$calculo', '$razon_deposito', '$json_info', 'Completado', '$tiempo')";
-    $actualizar = "UPDATE `usuario` SET `disponible`=`disponible`+$calculo,`disponible_historico`=`disponible_historico`+$calculo WHERE `id`=$usuario_receptor";
+    $actualizar = "UPDATE `usuario` SET `disponible`=`disponible`+$calculo,`disponible_historico`=`disponible_historico`+$calculo,Bono_recibido=Bono_recibido+$calculo WHERE `id`=$usuario_receptor";
+    $insert2 = "INSERT INTO `historico_diario`(`id_user`, `id_contractos`, `monto`, `porciento`, `fecha`) VALUES ($usuario_receptor,'139','$calculo','$porciento','$fecha')";
+    mysqli_query($conexion, $insert2);
     mysqli_query($conexion, $actualizar);
     if (mysqli_query($conexion, $insert)) {
         $update = "UPDATE `contractos` SET `rendimiento_entregado`=1 WHERE `hash`='$hash'";
         mysqli_query($conexion, $update);
     }
     return true;
+}
+
+
+
+/**
+ * Si la suma del bono recibido y el monto a recibir es superior al monto total del contrato, entonces
+ * el monto a recibir es la diferencia entre el monto total del contrato y el bono recibido. De lo
+ * contrario, la cantidad a recibir es la cantidad a recibir.
+ * 
+ * Args:
+ *   id: La identificación del usuario
+ *   cantidad: el monto del bono
+ * 
+ * Returns:
+ *   El valor de la variable .
+ */
+/**
+ * Si la suma de la bonificación recibida y el monto a recibir es superior al monto total del contrato,
+ * entonces el monto a recibir es la diferencia entre el monto total del contrato y la bonificación
+ * recibida. De lo contrario, la cantidad a recibir es la cantidad a recibir.
+ * 
+ * Args:
+ *   id: La identificación del usuario
+ *   cantidad: el monto del bono
+ * 
+ * Returns:
+ *   El valor de la variable .
+ */
+function overdraft_bonus($id, $cantidad)
+{
+    include(dirname(__FILE__) . '/../../assets/db/db.php');
+    $sql = "SELECT `Bono_recibido`,SUM(contractos.cantidad) FROM `usuario` INNER JOIN contractos on contractos.id_user=usuario.id WHERE usuario.`id`=$id";
+    $data = mysqli_fetch_array(mysqli_query($conexion, $sql));
+    if (($cantidad + $data[0]) >= $data[1]) {
+        $valor = $data[1] - ($data[0]);
+    } else {
+        $valor = $cantidad;
+    }
+    return $valor;
 }
 /**
  * Comprueba si la dirección es una dirección TRC20.
@@ -792,4 +863,102 @@ function Pagar_referencia($usuario_receptor, $cantidad, $num_contrato, $hash, $n
 function isTrc20($address)
 {
     return substr($address, 0, 1) == "T" and strlen($address) == 34;
+}
+function days_block()
+{
+    
+    if (date('w') == 6) {
+    $fecha_actual = strtotime(date("d-m-Y H:i:00", time()));
+    $fecha_entrada = strtotime(date("d-m-Y 04:00:00"));
+
+    if ($fecha_actual > $fecha_entrada) {
+        $inicio = 1;
+    } else {
+        $inicio = 0;
+    }
+
+    $fecha_actual = strtotime(date("d-m-Y H:i:00", time()));
+    $fecha_entrada = strtotime(date("d-m-Y 13:28:59"));
+
+    if ($fecha_actual > $fecha_entrada) {
+        $final = 1;
+    } else {
+        $final = 0;
+    }
+    if ($inicio > $final) {
+        $activar  = 1;
+    } else {
+        $activar = 0;
+    }
+
+    }else{
+        $activar = 0;
+    }
+    return $activar;
+}
+
+/**
+ * Toma una identificación y una dirección de billetera y envía un correo electrónico al usuario con la
+ * dirección de la billetera.
+ * 
+ * Args:
+ *   id: identificación de usuario
+ *   wallet: La dirección de la billetera
+ */
+function add_wallet($id, $wallet)
+{
+    $dotenv = new Dotenv\Dotenv(dirname(__FILE__) . '/../../.');
+    $dotenv->load();
+    include(dirname(__FILE__) . '/../../assets/db/db.php');
+    $sql = "SELECT `email`,`nombre` FROM `usuario` WHERE `id`=$id";
+    $data = mysqli_fetch_array(mysqli_query($conexion, $sql));
+    $email = $data['email'];
+    $sql = "SELECT `estructura` FROM `plantillas_email` WHERE `id` = 6";
+    $estrutura = mysqli_fetch_array(mysqli_query($conexion, $sql));
+
+    /* Crear una carga útil con la billetera y la identificación. */
+    $payload = ['wallet' => $wallet, 'id' => cifrar($id)];
+    $jwt = JWT::encode($payload, getenv('key_cifrado'), 'HS256');
+    $hora = date('Y-m-d h:i:s a');
+
+    $palabras_claves = array("@nombre@", "@wallet@", '@ip@', '@hora@', "@link@");
+    $palabras_claves_changer = array($data['nombre'], $wallet, get_client_ip_env(), $hora, 'https://app.smartblessingcloud.com/?wallet_confirm=' . $jwt);
+    $html = str_replace($palabras_claves, $palabras_claves_changer, $estrutura['estructura']);
+    $subjet = 'Cambio de dirección de retiro';
+    enviar_email($subjet, $email, $html);
+}
+/**
+ * Toma un JWT y lo decodifica.
+ * 
+ * Args:
+ *   jwt: El token JWT que desea decodificar.
+ */
+function Cambiar_wallet($jwt)
+{
+    include(dirname(__FILE__) . '/../../assets/db/db.php');
+    /* Decodificación del token JWT y obtención de la identificación. */
+    $dotenv = new Dotenv\Dotenv(dirname(__FILE__) . '/../../.');
+    $dotenv->load();
+    $decoded = JWT::decode($jwt, new Key(getenv('key_cifrado'), 'HS256'));
+    $id = ($decoded->id);
+
+    /* Convertir la variable  de una cadena a un objeto. */
+    $id = json_encode($id);
+    $id = json_decode($id);
+
+    /* Descifrando los datos. */
+    $id = descrifar($id->data);
+    /* Tomando los datos de la variable id y asignándolos a la variable . */
+    $id=$id->data;
+    /* Decodificando la cadena JSON y luego accediendo a la propiedad de la billetera. */
+    $select = "UPDATE `usuario` SET `wallet`='$decoded->wallet' WHERE `id`=$id";
+    $json=['razon'=>'Cambio o agrego una wallet','data'=>['wallet agregada'=>$decoded->wallet,'ip de confirmacion'=>get_client_ip_env()]];
+    $json = json_encode($json);
+    if (mysqli_query($conexion,$select)) {
+        $sql="INSERT INTO `seguimiento`(`id_user`, `json`) VALUES ($id,'$json')";
+        mysqli_query($conexion,$sql);
+        print header("refresh:1.5;url=/?verificada_wallet"); 
+    }else {
+        print header("refresh:1.5;url=/?error_wallet"); 
+    }
 }

@@ -78,18 +78,18 @@ include '../../vistas/asset/header.html';
                                             <i class="fas fa-money-check"></i></a>
                                     </div>
                                     <div class="col-6">
-                                        <a class="btn btn-dark " href="javascript:Mantenimiento()">Retirar <i
-                                                class="fas fa-handshake"></i></a>
+                                        <a class="btn btn-dark " href="javascript:void(0);" onclick="retiros()">Retirar
+                                            <i class="fas fa-handshake"></i></a>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <?php
-    $sql_link = "SELECT COUNT(*) FROM `link_referido` where `enlace_primario`=$id";
-    $referidos = mysqli_fetch_array(mysqli_query($conexion, $sql_link));
-    if ($referidos[0] > 0) {
-    ?>
+                    $sql_link = "SELECT COUNT(*) FROM `link_referido` where `enlace_primario`=$id";
+                    $referidos = mysqli_fetch_array(mysqli_query($conexion, $sql_link));
+                    if ($referidos[0] > 0) {
+                    ?>
 
                     <div class="col-md-12 col-sm-12">
                         <div class="add-balance-area py-2">
@@ -104,9 +104,8 @@ include '../../vistas/asset/header.html';
                         </div>
                     </div>
                     <?php
-    }
+                    }
                     ?>
-
                 </div>
             </div>
             <div class="col-md-6 col-sm-12 ">
@@ -163,8 +162,9 @@ include '../../vistas/asset/header.html';
 
 <?php
 if ($data !== 0) {
-    $sql = "SELECT SUM(`monto`),`id_user`,DATE_FORMAT(`fecha`,'%a') FROM `historico_diario` WHERE `id_user`=$id GROUP BY `id_user`, DATE_FORMAT(`fecha`, '%Y-%m-%d') ORDER BY DATE_FORMAT(`fecha`,'%d') ASC;";
-    $query = mysqli_query($conexion, $sql);
+    $s = date('W');
+    $sql2 = "SELECT SUM(`monto`),`id_user`,DATE_FORMAT(`fecha`,'%a') FROM `historico_diario` WHERE `id_user`=$id and DATE_FORMAT(`fecha`,'%u')=$s GROUP BY `id_user`, DATE_FORMAT(`fecha`, '%Y-%m-%d') ORDER BY id ASC";
+    $query = mysqli_query($conexion, $sql2);
     $a = 1;
     while ($data = mysqli_fetch_array($query)) {
         if ($a < 2) {
