@@ -49,8 +49,8 @@ function enviar_email($Subject, $email, $mensaje)
     $mail = new PHPMailer();
     //Tell PHPMailer to use SMTP
     $mail->isSMTP();
-    $email_institucional = 'smartblessingcloud@gmail.com'; // correo para smpt
-    $password_institucional = 'fnoqqtypwyjgvltw'; /// contraseña del smtp
+    $email_institucional = 'x@gmail.com'; // correo para smpt
+    $password_institucional = 'x'; /// contraseña del smtp
     $nombre_envio_mail_smtp = 'SBC';
     $SMTPAuth_config = true; //conguraciones de seguridad de smtp
     $SMTPAutoTLS_config = true; //conguraciones de seguridad de smtp
